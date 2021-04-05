@@ -1,0 +1,2 @@
+class Userconnection < ApplicationRecord
+end
