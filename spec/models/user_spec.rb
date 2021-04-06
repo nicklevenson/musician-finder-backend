@@ -8,5 +8,8 @@ RSpec.describe User, type: :model do
   end
   describe 'associations' do
     it { should have_many(:connections).class_name('Connection') }
+    it { should have_many(:notifications).class_name('Notification') }
+    it { should have_many(:tags).class_name('Tag') }
+    it { should have_many(:requests).class_name('Request') }
   end
 end
