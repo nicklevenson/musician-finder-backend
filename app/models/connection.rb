@@ -1,5 +1,4 @@
 class Connection < ApplicationRecord
-  has_many :userconnections
-
-  has_many :users, through: :userconnections
+  belongs_to :connection_a, class_name: :User
+  belongs_to :connection_b, class_name: :User
 end

@@ -16,6 +16,8 @@ ActiveRecord::Schema.define(version: 2021_04_05_181926) do
   enable_extension "plpgsql"
 
   create_table "connections", force: :cascade do |t|
+    t.integer "connection_a_id"
+    t.integer "connection_b_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -35,20 +37,14 @@ ActiveRecord::Schema.define(version: 2021_04_05_181926) do
   end
 
   create_table "requests", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "requestor_id"
+    t.integer "receiver_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "tags", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "userconnections", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "connection_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
