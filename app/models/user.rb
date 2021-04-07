@@ -23,4 +23,13 @@ class User < ApplicationRecord
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
   end
+
+  def request_connection(user_id)
+    request = Request.create(requestor_id: self.id, receiver_id: user_id)
+
+  end
+
+  def pending_requests
+
+  end
 end

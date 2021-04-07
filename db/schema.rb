@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 2021_04_05_181926) do
   create_table "requests", force: :cascade do |t|
     t.integer "requestor_id"
     t.integer "receiver_id"
+    t.boolean "accepted", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
