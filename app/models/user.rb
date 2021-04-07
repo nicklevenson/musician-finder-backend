@@ -26,10 +26,9 @@ class User < ApplicationRecord
 
   def request_connection(user_id)
     request = Request.create(requestor_id: self.id, receiver_id: user_id)
-
   end
 
-  def pending_requests
-
+  def incoming_pending_requests
+    self.connection_requests_as_receiver.where("accepted = false").map{|request| User.find(request.requestor_id)}
   end
 end

@@ -51,8 +51,14 @@ RSpec.describe User, type: :model do
     describe("User can request a connection") do
       it "can request a user to connect" do
         # print @user1.connection_requests_as_requestor
-        print @user2.connection_requests_as_receiver.first.requestor_id
-        print @user3.connection_requests_as_receiver
+        # print @user2.connection_requests_as_receiver.first.requestor_id
+        # print @user3.connection_requests_as_receiver
+      end
+    end
+
+    describe("Can see incoming pending requests") do
+      it "shows all pending incoming requests" do
+        print @user3.incoming_pending_requests
       end
     end
 
