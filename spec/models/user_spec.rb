@@ -17,16 +17,22 @@ RSpec.describe User, type: :model do
     before do
       @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
       @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
+      @user3 = User.create(username: "hello3", email: "hello.com3", location: "LA3")
+      connection = Connection.create(connection_a_id: @user1.id, connection_b_id: @user2.id)
 
       connection = Connection.create()
       connection.connection_a_id = @user1.id
-      connection.connection_b_id = @user2.id
+      connection.connection_b_id = @user3.id
       connection.save
       
     end
     describe("has association") do
       it "associates connected users" do
         expect(@user1.connected_users.first).to eq(@user2)
+        expect(@user2.connected_users.first).to eq(@user1)
+        expect(@user1.connected_users.second).to eq(@user3)
+        expect(@user3.connected_users.first).to eq(@user1)
+        print @user3.connected_users
       end
     end
   end
