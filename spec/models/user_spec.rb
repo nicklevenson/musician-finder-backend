@@ -7,7 +7,6 @@ RSpec.describe User, type: :model do
     it { should validate_presence_of(:location) }
   end
   describe 'associations' do
-    it { should have_many(:connected_users) }
     it { should have_many(:notifications).class_name('Notification') }
     it { should have_many(:tags).class_name('Tag') }
     it { should have_many(:connection_requests_as_requestor) }
@@ -19,8 +18,11 @@ RSpec.describe User, type: :model do
       @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
       @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
 
-      @user1.connections << Connection.create(connection_a_id: @user1.id, connection_b_id: @user2.id)
-      @user1.save
+      connection = Connection.create()
+      connection.connection_a_id = @user1.id
+      connection.connection_b_id = @user2.id
+      connection.save
+      
     end
     describe("has association") do
       it "associates connected users" do

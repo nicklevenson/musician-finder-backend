@@ -20,6 +20,7 @@ class User < ApplicationRecord
   validates :username, :email, :location, presence: true
 
   def connected_users
-    a_connected_users + b_connected_users
+    connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
+    connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
   end
 end
