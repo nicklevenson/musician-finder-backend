@@ -71,6 +71,16 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe("Reject Connection Request") do
+      before do
+        @user2.reject_incoming_connection(@user2.incoming_pending_requests.first.id)
+      end
+      it "destroys an incoming request" do
+        expect(@user2.incoming_pending_requests).to be_empty
+        expect(@user1.outgoing_pending_requests).to be_empty
+      end
+    end
+
   end
 
 end
