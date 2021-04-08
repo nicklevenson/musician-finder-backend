@@ -31,4 +31,13 @@ class User < ApplicationRecord
   def incoming_pending_requests
     self.connection_requests_as_receiver.where("accepted = false").map{|request| User.find(request.requestor_id)}
   end
+
+  def accept_incoming_connection(requesting_user_id)
+    request = Request.find_by(requestor_id: requesting_user_id, receiver_id: self.id)
+    request.accepted = true
+
+    if request.accepted
+      Connection.create(connection_a_id: self.id, connection_b_id: requesting_user_id)
+    end
+  end
 end
