@@ -49,4 +49,16 @@ class User < ApplicationRecord
     request = Request.find_by(requestor_id: requesting_user_id, receiver_id: self.id)
     request.destroy
   end
+
+  def recommended_users
+    similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name} && (self.tags.map{|tag| tag.name})).length}
+    similar_users.filter{|user| user != self || self.users_not_connected.include?(user)}
+    #find users whose tags include current user's tags
+    #order by amount of tags
+    #filter users who are connected with current user
+  end
+
+  def users_not_connected
+    User.all.select{|u|!u.connected_users.include?(self) && u != self}
+  end
 end

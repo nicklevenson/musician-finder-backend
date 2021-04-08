@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+
+  before do
+    @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
+    @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
+    @user3 = User.create(username: "hello3", email: "hello.com3", location: "LA3")
+  end
   describe 'validations' do
     it { should validate_presence_of(:username) }
     it { should validate_presence_of(:email) }
@@ -17,9 +23,7 @@ RSpec.describe User, type: :model do
 
   describe "has many connected users" do
     before do
-      @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
-      @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
-      @user3 = User.create(username: "hello3", email: "hello.com3", location: "LA3")
+     
       connection = Connection.create(connection_a_id: @user1.id, connection_b_id: @user2.id)
 
       connection = Connection.create()
@@ -41,9 +45,6 @@ RSpec.describe User, type: :model do
 
   describe "connection requests" do
     before do
-      @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
-      @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
-      @user3 = User.create(username: "hello3", email: "hello.com3", location: "LA3")
       @user1.request_connection(@user2.id)
       @user2.request_connection(@user3.id)
     end
@@ -81,6 +82,37 @@ RSpec.describe User, type: :model do
       end
     end
 
+  end
+
+  describe("Listing user relations") do
+    describe("Users not connected") do
+      it "gives a list of users who are not connected" do
+       
+        expect(@user1.users_not_connected).to include(@user2, @user3)
+      end
+    end
+
+    describe("recommended users") do
+      before do
+        @user1.tags.build(name: "rock")
+        @user1.tags.build(name: "country")
+        @user1.tags.build(name: "blues")
+        @user1.save
+
+        @user2.tags.build(name: "rock")
+        @user2.tags.build(name: "country")
+        @user2.tags.build(name: "disco")
+        @user2.save
+        
+        @user3.tags.build(name: "house")
+        @user3.tags.build(name: "rap")
+        @user3.tags.build(name: "disco")
+        @user3.save
+      end
+      it "gives a list of reccomended users based on similar tags" do
+        print @user1.recommended_users
+      end
+    end
   end
 
 end
