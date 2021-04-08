@@ -112,9 +112,12 @@ RSpec.describe User, type: :model do
       it "gives a list of recommended users based on similar tags" do
         expect(@user1.recommended_users.first[:user]).to eq(@user2)
         expect(@user1.recommended_users.last[:user]).to eq(@user3)
-       
+        expect(@user1.recommended_users.last[:similar_tags]).to eq([])
+        expect(@user1.recommended_users.first[:similar_tags]).to eq(["rock", "country"])
+
         expect(@user2.recommended_users.first[:user]).to eq(@user1)
         expect(@user2.recommended_users.last[:user]).to eq(@user3)
+        expect(@user2.recommended_users.last[:similar_tags]).to eq(["disco"])
 
         expect(@user3.recommended_users.first[:user]).to eq(@user2)
       end
