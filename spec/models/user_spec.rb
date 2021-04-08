@@ -103,14 +103,18 @@ RSpec.describe User, type: :model do
         @user2.tags.build(name: "country")
         @user2.tags.build(name: "disco")
         @user2.save
-        
+
         @user3.tags.build(name: "house")
         @user3.tags.build(name: "rap")
         @user3.tags.build(name: "disco")
         @user3.save
       end
       it "gives a list of reccomended users based on similar tags" do
-        print @user1.recommended_users
+        expect(@user1.recommended_users.first[:user]).to eq(@user2)
+        expect(@user1.recommended_users.last[:user]).to eq(@user3)
+       
+        expect(@user2.recommended_users.first[:user]).to eq(@user1)
+        expect(@user2.recommended_users.last[:user]).to eq(@user3)
       end
     end
   end
