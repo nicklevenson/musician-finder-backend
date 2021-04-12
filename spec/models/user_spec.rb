@@ -70,6 +70,9 @@ RSpec.describe User, type: :model do
         expect(@user2.connected_users.first).to eq(@user1)
         expect(@user1.connected_users.first).to eq(@user2)
       end
+      it "creates a new chatroom" do
+        expect(@user1.chatrooms.first.users).to eq([@user1, @user2])
+      end
     end
 
     describe("Reject Connection Request") do
