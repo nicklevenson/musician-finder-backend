@@ -26,6 +26,7 @@ class User < ApplicationRecord
 
   def request_connection(user_id)
     request = Request.create(requestor_id: self.id, receiver_id: user_id)
+    User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
   end
 
   def incoming_pending_requests
@@ -42,6 +43,7 @@ class User < ApplicationRecord
 
     if request.accepted
       Connection.create(connection_a_id: self.id, connection_b_id: requesting_user_id)
+      User.find(requesting_user_id).notifications << Notification.create(content: "#{self.username} has accepted your connection request")
     end
   end
 

@@ -122,6 +122,21 @@ RSpec.describe User, type: :model do
         expect(@user3.recommended_users.first[:user]).to eq(@user2)
       end
     end
+
+    describe "notifications" do
+      before do
+        @user1.request_connection(@user2.id)
+        @user1.request_connection(@user3.id)
+        @user3.accept_incoming_connection(@user1.id)
+      end
+      it "creates a new notification for the user that is being requested" do
+        expect(@user2.notifications.length).to eq(1)
+      end
+      it "creates a new notification for the requesting user when the request was accepted" do
+        expect(@user3.notifications.length).to eq(1)
+        expect(@user1.notifications.length).to eq(1)
+      end 
+    end
   end
 
 end
