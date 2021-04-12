@@ -3,7 +3,9 @@ class User < ApplicationRecord
   has_many :tags, through: :usertags
   has_many :notifications
   has_many :posts
-  
+  has_many :messages
+  has_many :userchatrooms
+  has_many :chatrooms, through: :userchatrooms
   has_many :connection_requests_as_requestor,
     foreign_key: :requestor_id,
     class_name: :Request

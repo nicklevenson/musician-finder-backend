@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :chatrooms
+  resources :messages
   resources :posts
   resources :notifications
   resources :connections
