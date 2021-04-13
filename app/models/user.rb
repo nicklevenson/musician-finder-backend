@@ -19,7 +19,7 @@ class User < ApplicationRecord
   has_many :a_connected_users, foreign_key: :connection_a_id, class_name: :Connection
   has_many :b_connected_users, foreign_key: :connection_b_id, class_name: :Connection
 
-  validates :username, :email, :location, presence: true
+  validates :username, :email, presence: true
 
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
