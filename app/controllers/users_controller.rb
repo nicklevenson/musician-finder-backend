@@ -15,12 +15,16 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
-    @user = User.new(user_params)
-
-    if @user.save
-      render json: @user, status: :created, location: @user
-    else
-      render json: @user.errors, status: :unprocessable_entity
+    user = User.find_or_create_by(uid: auth['uid'], provider: auth['provider']) do |u|
+      u.image = auth['info']['Providerimage']
+      u.username = auth['info']['name']
+      u.email = auth['info']['email']
+    end
+    if user
+      #save image whenever its a login - since they can expire
+      user.image = auth['info']['Providerimage']
+      token = encode_token(user_id: user.id)
+      redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
     end
   end
 
@@ -48,4 +52,8 @@ class UsersController < ApplicationController
     def user_params
       params.fetch(:user, {})
     end
+
+    def auth
+      request.env['omniauth.auth']
+    end 
 end

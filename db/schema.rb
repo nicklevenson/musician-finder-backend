@@ -76,6 +76,9 @@ ActiveRecord::Schema.define(version: 2021_04_12_214351) do
     t.string "photo"
     t.string "location"
     t.text "bio"
+    t.string "uid"
+    t.string "provider"
+    t.string "providerImage", default: "https://icon-library.net//images/no-user-image-icon/no-user-image-icon-27.jpg"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
