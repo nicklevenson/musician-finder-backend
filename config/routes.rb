@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   get '/authenticate-facebook', to: 'sessions#authenticate_facebook'
   get 'auth/:provider/callback', to: 'users#create'
 
-
+  get 'users/:id/recommended_users', to: 'users#get_recommended_users'
   resources :chatrooms
   resources :messages
   resources :posts

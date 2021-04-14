@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy]
+  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users]
 
   # GET /users
   def index
@@ -12,6 +12,10 @@ class UsersController < ApplicationController
   def show
     connections = @user.connected_users
     render json: @user, methods: [:connected_users, :recommended_users]
+  end
+
+  def get_recommended_users
+    render json: @user.recommended_users
   end
 
   # POST /users
