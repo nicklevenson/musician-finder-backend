@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   # GET /users/1
   def show
     connections = @user.connected_users
-    render json: @user, methods: :connected_users
+    render json: @user, methods: [:connected_users, :recommended_users]
   end
 
   # POST /users
