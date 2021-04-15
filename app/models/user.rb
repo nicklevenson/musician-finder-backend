@@ -29,6 +29,11 @@ class User < ApplicationRecord
   def request_connection(user_id)
     request = Request.create(requestor_id: self.id, receiver_id: user_id)
     User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
+    if request.save
+      true
+    else
+      false
+    end
   end
 
   def incoming_pending_requests

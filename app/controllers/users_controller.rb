@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users]
+  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users, :request_connection]
 
   # GET /users
   def index
@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   # GET /users/1
   def show
     connections = @user.connected_users
-    render json: @user, methods: [:connected_users]
+    render json: @user, methods: [:connected_users, :outgoing_pending_requests]
   end
 
   def get_recommended_users
@@ -30,6 +30,13 @@ class UsersController < ApplicationController
       user.providerImage = auth['info']['image']
       token = encode_token(user_id: user.id)
       redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
+    end
+  end
+
+  def request_connection
+    byebug
+    if @user.request_connection(params[:requested_id])
+      render json: {message: "Successfully requested"}
     end
   end
 
