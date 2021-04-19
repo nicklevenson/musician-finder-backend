@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'auth/:provider/callback', to: 'users#create'
 
   get 'users/:id/recommended_users', to: 'users#get_recommended_users'
+  get '/users/:id/incoming_requests', to: 'users#get_incoming_requests'
   post 'users/:id/request_connection', to: 'users#request_connection'
   resources :chatrooms
   resources :messages

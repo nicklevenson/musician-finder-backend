@@ -23,7 +23,7 @@ class User < ApplicationRecord
 
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
+    connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
   end
 
   def request_connection(user_id)
@@ -37,7 +37,7 @@ class User < ApplicationRecord
   end
 
   def incoming_pending_requests
-    self.connection_requests_as_receiver.where("accepted = false").map{|request| User.find(request.requestor_id)}
+    self.connection_requests_as_receiver.where("accepted = false").map{|request| similar_tags(request.requestor_id)}
   end
 
   def outgoing_pending_requests
@@ -66,10 +66,15 @@ class User < ApplicationRecord
   def recommended_users
     similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})).length}.reverse()
     filtered_self_and_connections = similar_users.filter{|user| user != self || self.users_not_connected.include?(user)}
-    filtered_self_and_connections.map{|u| {user: u, similar_tags: u.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})}}
+    filtered_self_and_connections.map{|u| u.similar_tags(self.id)}
   end
 
   def users_not_connected
-    User.all.select{|u|!u.connected_users.include?(self) && u != self}
+    User.all.select{|u|!u.connected_users.include?(self) && u != self}.map{|user| similar_tags(user.id)}
+  end
+
+  def similar_tags(user_id)
+    other_user = User.find(user_id)
+    {user: other_user, similar_tags: other_user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})}
   end
 end
