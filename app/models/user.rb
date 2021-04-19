@@ -47,8 +47,9 @@ class User < ApplicationRecord
   def accept_incoming_connection(requesting_user_id)
     request = Request.find_by(requestor_id: requesting_user_id, receiver_id: self.id)
     request.accepted = true
+    request.save
     requested_user = User.find(requesting_user_id)
-    if request.accepted
+    if request.save
       Connection.create(connection_a_id: self.id, connection_b_id: requesting_user_id)
       requested_user.notifications << Notification.create(content: "#{self.username} has accepted your connection request")
       chatroom = Chatroom.create()
