@@ -23,9 +23,13 @@ class User < ApplicationRecord
 
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
+    connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
   end
 
+  def connected_users_with_tags
+    connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
+    connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
+  end
   def request_connection(user_id)
     request = Request.create(requestor_id: self.id, receiver_id: user_id)
     User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
@@ -65,12 +69,12 @@ class User < ApplicationRecord
 
   def recommended_users
     similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})).length}.reverse()
-    filtered_self_and_connections = similar_users.filter{|user| user != self || self.users_not_connected.include?(user)}
-    filtered_self_and_connections.map{|u| u.similar_tags(self.id)}
+    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user)}
+    filtered_self_and_connections.map{|u| u.similar_tags(u.id)}
   end
 
   def users_not_connected
-    User.all.select{|u|!u.connected_users.include?(self) && u != self}.map{|user| similar_tags(user.id)}
+    User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
   end
 
   def similar_tags(user_id)
