@@ -41,7 +41,7 @@ class User < ApplicationRecord
   end
 
   def outgoing_pending_requests
-    self.connection_requests_as_requestor.where("accepted = false").map{|request| User.find(request.requestor_id)}
+    self.connection_requests_as_requestor.where("accepted = false").map{|request| User.find(request.receiver_id)}
   end
 
   def accept_incoming_connection(requesting_user_id)

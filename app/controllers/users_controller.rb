@@ -34,7 +34,7 @@ class UsersController < ApplicationController
   end
 
   def request_connection
-    byebug
+    
     if @user.request_connection(params[:requested_id])
       render json: {message: "Successfully requested"}
     end
