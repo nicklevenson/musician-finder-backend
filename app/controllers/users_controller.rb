@@ -15,7 +15,7 @@ class UsersController < ApplicationController
   end
 
   def get_recommended_users
-    render json: @user.recommended_users
+    render json: @user.recommended_users, include: :connected_users_with_tags
   end
 
   def get_incoming_requests
