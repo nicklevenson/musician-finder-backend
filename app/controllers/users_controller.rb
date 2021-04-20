@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users, :request_connection, :get_incoming_requests]
+  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users, :request_connection, :get_incoming_requests, :accept_connection, :reject_connection]
 
   # GET /users
   def index
@@ -38,9 +38,20 @@ class UsersController < ApplicationController
   end
 
   def request_connection
-    
     if @user.request_connection(params[:requested_id])
       render json: {message: "Successfully requested"}
+    end
+  end
+
+  def accept_connection
+    if @user.accept_incoming_connection(params[:requesting_user_id])
+      render json: {message: "Successfully accepted"}
+    end
+  end
+
+  def reject_connection
+    if @user.reject_incoming_connection(params[:requesting_user_id])
+      render json: {message: "Successfully rejected"}
     end
   end
 
