@@ -19,7 +19,7 @@ class UsersController < ApplicationController
   end
 
   def get_incoming_requests
-    render json: @user.incoming_pending_requests
+    render json: @user.incoming_pending_requests, methods: [:connected_users_with_tags]
   end
 
   # POST /users

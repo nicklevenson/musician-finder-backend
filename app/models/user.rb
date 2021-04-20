@@ -21,6 +21,7 @@ class User < ApplicationRecord
 
   validates :username, :email, presence: true
 
+
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
@@ -31,13 +32,19 @@ class User < ApplicationRecord
     connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
   end
   def request_connection(user_id)
-    request = Request.create(requestor_id: self.id, receiver_id: user_id)
-    User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
-    if request.save
-      true
+    if !(connected_users.include?(User.find(user_id)))
+      request = Request.create(requestor_id: self.id, receiver_id: user_id)
+      User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
+      if request.save
+        true
+      else
+        false
+      end
     else
-      false
+      "Already Connected"
     end
+
+  
   end
 
   def incoming_pending_requests
