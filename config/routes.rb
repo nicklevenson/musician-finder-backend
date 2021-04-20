@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get '/authenticate-facebook', to: 'sessions#authenticate_facebook'
   get 'auth/:provider/callback', to: 'users#create'
 
+  get 'users/:id/connected_users', to: 'users#get_connected_users'
   get 'users/:id/recommended_users', to: 'users#get_recommended_users'
   get '/users/:id/incoming_requests', to: 'users#get_incoming_requests'
   post 'users/:id/request_connection', to: 'users#request_connection'
