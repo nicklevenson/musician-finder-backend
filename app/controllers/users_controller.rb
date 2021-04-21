@@ -10,8 +10,7 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-
-    render json: @user, methods: [:connected_users_with_tags, :outgoing_pending_requests]
+    render json: @user, methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications]
   end
 
   def get_connected_users

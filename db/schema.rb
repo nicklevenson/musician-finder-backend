@@ -38,6 +38,9 @@ ActiveRecord::Schema.define(version: 2021_04_12_214351) do
   create_table "notifications", force: :cascade do |t|
     t.integer "user_id"
     t.string "content"
+    t.boolean "read", default: false
+    t.integer "involved_user_id"
+    t.string "involved_username"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -74,7 +77,7 @@ ActiveRecord::Schema.define(version: 2021_04_12_214351) do
     t.string "username"
     t.string "email"
     t.string "photo"
-    t.string "location"
+    t.string "location", default: "Earth"
     t.text "bio"
     t.string "uid"
     t.string "provider"

@@ -34,7 +34,7 @@ class User < ApplicationRecord
   def request_connection(user_id)
     if !(connected_users.include?(User.find(user_id)))
       request = Request.find_or_create_by(requestor_id: self.id, receiver_id: user_id)
-      User.find(user_id).notifications << Notification.create(content: "#{self.username} has requested to connect with you")
+      User.find(user_id).notifications << Notification.create(content: "has requested to connect with you", involved_username: self.username , involved_user_id: self.id)
       if request.save
         true
       else
@@ -60,7 +60,7 @@ class User < ApplicationRecord
     requested_user = User.find(requesting_user_id)
     if request
       Connection.find_or_create_by(connection_a_id: self.id, connection_b_id: requesting_user_id)
-      requested_user.notifications << Notification.create(content: "#{self.username} has accepted your connection request")
+      requested_user.notifications << Notification.create(content: "has accepted your connection request", involved_username: self.username , involved_user_id: self.id)
       chatroom = Chatroom.create()
       chatroom.users << self
       chatroom.users << requested_user
