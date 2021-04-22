@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy, :get_recommended_users, :request_connection, :get_incoming_requests, :accept_connection, :reject_connection, :get_connected_users]
+  before_action :set_user, only: [:show, :get_similar_tags, :update, :destroy, :get_recommended_users, :request_connection, :get_incoming_requests, :accept_connection, :reject_connection, :get_connected_users]
 
   # GET /users
   def index
@@ -11,6 +11,10 @@ class UsersController < ApplicationController
   # GET /users/1
   def show
     render json: @user, methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications]
+  end
+
+  def get_similar_tags
+    render json: @user.similar_tags(params[:other_user_id])[:similar_tags]
   end
 
   def get_connected_users

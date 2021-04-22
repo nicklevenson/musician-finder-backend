@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'users/:id/connected_users', to: 'users#get_connected_users'
   get 'users/:id/recommended_users', to: 'users#get_recommended_users'
   get '/users/:id/incoming_requests', to: 'users#get_incoming_requests'
+  get 'users/:id/get_similar_tags/:other_user_id', to: 'users#get_similar_tags'
   post 'users/:id/request_connection', to: 'users#request_connection'
   post 'users/:id/accept_connection', to: 'users#accept_connection'
   post 'users/:id/reject_connection', to: 'users#reject_connection'
