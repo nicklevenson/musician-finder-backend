@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :get_similar_tags, :update, :destroy, :get_recommended_users, :request_connection, :get_incoming_requests, :accept_connection, :reject_connection, :get_connected_users]
-
+  before_action :authorized, only: :show
   # GET /users
   def index
     @users = User.all
