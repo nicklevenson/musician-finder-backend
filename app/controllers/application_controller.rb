@@ -23,6 +23,7 @@ class ApplicationController < ActionController::API
   end
   
   def current_user
+ 
     if decoded_token
       user_id = decoded_token[0]['user_id']
       user = User.find_by(id: user_id)
@@ -34,7 +35,7 @@ class ApplicationController < ActionController::API
   end
 
   def authorized
-    render json: {message: "Please Login", status: :unauthorized} unless logged_in?
+    render json: {message: "Please Login", status: :unauthorized} unless logged_in? && current_user.id === params[:id].to_i || current_user.id === params[:user_id].to_i
   end
   
   def authenticate
