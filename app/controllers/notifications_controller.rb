@@ -13,6 +13,10 @@ class NotificationsController < ApplicationController
     render json: @notification
   end
 
+  def make_read
+    Notification.make_read(params[:ids])
+  end
+
   # POST /notifications
   def create
     @notification = Notification.new(notification_params)
