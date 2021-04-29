@@ -40,6 +40,7 @@ class UsersController < ApplicationController
       if auth['credentials']['token']
         u.token = auth['credentials']['token']
         u.refresh_token = auth['credentials']['refresh_token']
+        u.fetch_spotify_data
       end
     end
     if user
