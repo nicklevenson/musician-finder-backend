@@ -78,7 +78,7 @@ class User < ApplicationRecord
 
   def recommended_users
     similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})).length}.reverse()[0..50]
-    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user)}.filter{|user| !self.rejected_users.include?(user)}
+    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
     filtered_self_and_connections.map{|u| u.similar_tags(u.id)}
   end
 
