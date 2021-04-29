@@ -7,6 +7,7 @@ gem 'omniauth'
 gem 'omniauth-oauth2'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-facebook'
+gem 'omniauth-spotify'
 gem 'jwt'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'

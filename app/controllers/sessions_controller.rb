@@ -6,4 +6,8 @@ class SessionsController < ApplicationController
   def authenticate_facebook
     redirect_to '/auth/facebook'
   end
+
+  def authenticate_spotify
+    redirect_to '/auth/spotify'
+  end
 end

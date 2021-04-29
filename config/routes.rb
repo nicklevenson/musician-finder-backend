@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   get '/authenticate-google', to: 'sessions#authenticate_google'
   get '/authenticate-facebook', to: 'sessions#authenticate_facebook'
+  get '/authenticate-spotify', to: 'sessions#authenticate_spotify'
   get 'auth/:provider/callback', to: 'users#create'
 
   get 'users/:id/connected_users', to: 'users#get_connected_users'

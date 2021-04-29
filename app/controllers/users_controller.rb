@@ -32,6 +32,7 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
+    byebug
     user = User.find_or_create_by(uid: auth['uid'], provider: auth['provider']) do |u|
       u.providerImage = auth['info']['image']
       u.username = auth['info']['name']
