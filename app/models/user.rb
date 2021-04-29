@@ -112,7 +112,8 @@ class User < ApplicationRecord
       items = JSON.parse(resp)['items']
       if items[0]
         items.each do |i|
-          tag = Tag.find_or_create_by(name: i["name"])
+          name = i["name"]
+          tag = Tag.find_or_create_by(name: name)
           self.tags << tag
         end
       end
