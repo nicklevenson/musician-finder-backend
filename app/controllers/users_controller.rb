@@ -69,6 +69,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def reject_user
+    if @user.reject_user(params[:rejected_id])
+      render json: {message: "Successfully rejected"}
+    end
+  end
+
   # PATCH/PUT /users/1
   def update
     if @user.update(user_params)
