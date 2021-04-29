@@ -89,6 +89,8 @@ ActiveRecord::Schema.define(version: 2021_04_29_162521) do
     t.string "uid"
     t.string "provider"
     t.string "providerImage", default: "https://icon-library.net//images/no-user-image-icon/no-user-image-icon-27.jpg"
+    t.string "token"
+    t.string "refresh_token"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

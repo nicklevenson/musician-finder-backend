@@ -100,4 +100,42 @@ class User < ApplicationRecord
     self.rejections.build(rejected_id: user_id, rejector_id: self.id)
     self.save
   end
+
+
+  def fetch_spotify_data
+    refresh_spotify_token
+    if self.provider = 'spotify'
+      header = {
+        Authorization: "Bearer #{self.token}"
+      }
+      resp = RestClient.get("https://api.spotify.com/v1/me/top/artists", header)
+      items = JSON.parse(resp)['items']
+      if items[0]
+        items.each do |i|
+          tag = Tag.find_or_create_by(name: i["name"])
+          self.tags << tag
+        end
+      end
+      byebug
+    end
+  end
+
+  def spotify_token_expired
+    (Time.now - self.updated_at) > 3300
+  end
+
+  def refresh_spotify_token
+    if spotify_token_expired
+      body = {
+        grant_type: "refresh_token",
+        refresh_token: self.refresh_token,
+        client_id: Rails.application.credentials.spotify[:client_id],
+        client_secret: Rails.application.credentials.spotify[:client_secret]
+      }
+
+      resp = RestClient.post('https://accounts.spotify.com/api/token', body)
+      json = JSON.parse(resp)
+      self.token = json["access_token"]
+    end
+  end
 end

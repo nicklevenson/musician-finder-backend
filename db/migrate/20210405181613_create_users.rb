@@ -9,6 +9,8 @@ class CreateUsers < ActiveRecord::Migration[6.1]
       t.string :uid
       t.string :provider
       t.string :providerImage, default: "https://icon-library.net//images/no-user-image-icon/no-user-image-icon-27.jpg"
+      t.string :token
+      t.string :refresh_token
       t.timestamps
     end
   end
