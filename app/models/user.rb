@@ -116,7 +116,6 @@ class User < ApplicationRecord
           self.tags << tag
         end
       end
-      byebug
     end
   end
 
