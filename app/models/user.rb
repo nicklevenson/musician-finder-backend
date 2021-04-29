@@ -114,7 +114,9 @@ class User < ApplicationRecord
         items.each do |i|
           name = i["name"]
           tag = Tag.find_or_create_by(name: name)
-          self.tags << tag
+          if !self.tags.include?(tag)
+            self.tags << tag
+          end
         end
       end
     end
