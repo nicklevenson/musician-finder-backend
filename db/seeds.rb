@@ -8,6 +8,5 @@
 user1 = User.create(username: "hello2", email: "hello.com2", location: "LA2", photo: "")
 user2 = User.create(username: "hello3", email: "hello.com3", location: "LA3", photo: "")
 
-user1.request_connection(1)
+user1.request_connection(2)
 
-user2.request_connection(1)

@@ -19,6 +19,9 @@ class User < ApplicationRecord
   has_many :a_connected_users, foreign_key: :connection_a_id, class_name: :Connection
   has_many :b_connected_users, foreign_key: :connection_b_id, class_name: :Connection
 
+  has_many :rejections, foreign_key: :rejector_id, class_name: :Rejection
+  
+
   validates :username, :email, presence: true
 
 
@@ -75,7 +78,7 @@ class User < ApplicationRecord
 
   def recommended_users
     similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})).length}.reverse()[0..50]
-    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user)}
+    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user)}.filter{|user| !self.rejected_users.include?(user)}
     filtered_self_and_connections.map{|u| u.similar_tags(u.id)}
   end
 
@@ -86,5 +89,15 @@ class User < ApplicationRecord
   def similar_tags(user_id)
     other_user = User.find(user_id)
     {user: other_user, similar_tags: other_user.tags.map{|tag| tag.name}.intersection(self.tags.map{|tag| tag.name})}
+  end
+
+
+  def rejected_users
+    User.where(id: self.rejections.map{|r| r.rejected_id})
+  end
+  
+  def reject_user(user_id)
+    self.rejections.build(rejected_id: user_id, rejector_id: self.id)
+    self.save
   end
 end
