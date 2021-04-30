@@ -103,7 +103,7 @@ class User < ApplicationRecord
 
 
   def fetch_spotify_data
-    if self.provider = 'spotify'
+    if self.provider === 'spotify'
       refresh_spotify_token
       header = {
         Authorization: "Bearer #{self.token}"
