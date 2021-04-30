@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_29_162521) do
+ActiveRecord::Schema.define(version: 2021_04_30_181701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,18 @@ ActiveRecord::Schema.define(version: 2021_04_29_162521) do
   create_table "connections", force: :cascade do |t|
     t.integer "connection_a_id"
     t.integer "connection_b_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "genres", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "instruments", force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -76,6 +88,20 @@ ActiveRecord::Schema.define(version: 2021_04_29_162521) do
   create_table "userchatrooms", force: :cascade do |t|
     t.integer "chatroom_id"
     t.integer "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "usergenres", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "genre_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "userinstruments", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "instrument_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

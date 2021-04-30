@@ -1,6 +1,10 @@
 class User < ApplicationRecord
   has_many :usertags
   has_many :tags, through: :usertags
+  has_many :userinstruments
+  has_many :instruments, through: :userinstruments
+  has_many :usergenres
+  has_many :genres, through: :usergenres
   has_many :notifications
   has_many :posts
   has_many :messages
