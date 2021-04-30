@@ -24,12 +24,12 @@ class User < ApplicationRecord
   has_many :b_connected_users, foreign_key: :connection_b_id, class_name: :Connection
 
   has_many :rejections, foreign_key: :rejector_id, class_name: :Rejection
-  
 
   validates :username, :email, presence: true
 
-
   after_create :new_user_notification
+
+  
 
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
@@ -149,6 +149,26 @@ class User < ApplicationRecord
       resp = RestClient.post('https://accounts.spotify.com/api/token', body)
       json = JSON.parse(resp)
       self.token = json["access_token"]
+    end
+  end
+
+
+  def tags_attributes=(tags_attributes)
+    tags_attributes.each do |tag_attribute|
+      tag = Tag.find_or_create_by(tag_attribute)
+      self.tags << tag
+    end
+  end
+  def genres_attributes=(genres_attributes)
+    genres_attributes.each do |genre_attribute|
+      genre = Genre.find_or_create_by(genre_attribute)
+      self.genres << genre
+    end
+  end
+  def instruments_attributes=(instruments_attributes)
+    instruments_attributes.each do |instrument_attribute|
+      instrument = Instrument.find_or_create_by(instrument_attribute)
+      self.instruments << instrument
     end
   end
 

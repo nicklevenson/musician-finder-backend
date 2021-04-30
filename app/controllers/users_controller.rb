@@ -97,8 +97,9 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.fetch(:user, {})
+      params.require(:user).permit(:bio, :location, tags_attributes: [:name], genres_attributes: [:name], instruments_attributes: [:name])
     end
+
 
     def auth
       request.env['omniauth.auth']
