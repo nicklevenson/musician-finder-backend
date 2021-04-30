@@ -25,6 +25,8 @@ class User < ApplicationRecord
   validates :username, :email, presence: true
 
 
+  after_create :new_user_notification
+
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
@@ -140,4 +142,10 @@ class User < ApplicationRecord
       self.token = json["access_token"]
     end
   end
+
+  private
+
+    def new_user_notification
+      self.notifications << Notification.create(content: "Thanks for joining Matchup Music! We're excited to have you.")
+    end
 end
