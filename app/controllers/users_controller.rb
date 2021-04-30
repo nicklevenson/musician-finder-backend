@@ -11,7 +11,7 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    render json: @user, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications, :tags => {only: :name}]
+    render json: @user, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications, :tags => {only: :name}, :genres => {only: :name}, :instruments => {only: :name}]
   end
 
   def get_similar_tags
