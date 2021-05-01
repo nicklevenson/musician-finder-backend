@@ -99,6 +99,15 @@ class User < ApplicationRecord
     Geocoding.get_distance_between(lat1, lng1, lat2, lng2)
   end
 
+  def is_in_range(user_id, range)
+    other_user = User.find(user_id)
+    if Geocoding.get_distance_between(lat1, lng1, lat2, lng2) < range
+      true
+    else
+      false
+    end
+  end
+
   def users_not_connected
     User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
   end
