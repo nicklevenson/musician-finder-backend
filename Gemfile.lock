@@ -92,6 +92,8 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
+    mapbox-sdk (2.3.0)
+      rest-client (~> 2.0.1)
     marcel (1.0.1)
     method_source (1.0.0)
     mime-types (3.3.1)
@@ -221,6 +223,7 @@ DEPENDENCIES
   byebug
   jwt
   listen (~> 3.3)
+  mapbox-sdk (~> 2.3.0)
   omniauth
   omniauth-facebook
   omniauth-google-oauth2
@@ -237,7 +240,7 @@ DEPENDENCIES
   tzinfo-data
 
 RUBY VERSION
-   ruby 3.0.0p0
+   ruby 3.0.1p64
 
 BUNDLED WITH
-   2.2.3
+   2.2.15
