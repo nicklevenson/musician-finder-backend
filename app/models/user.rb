@@ -88,6 +88,17 @@ class User < ApplicationRecord
     filtered_self_and_connections.map{|u| self.similar_tags(u.id)}
   end
 
+  def user_distance(user_id)
+    other_user = User.find(user_id)
+    other_user_coords = Geocoding.find_coords_with_city(other_user.location)
+    my_location = Geocoding.find_coords_with_city(self.location)
+    lat1 = other_user_coords[0]
+    lng1 = other_user_coords[1]
+    lat2 = my_location[0]
+    lng2 = my_location[1]
+    Geocoding.get_distance_between(lat1, lng1, lat2, lng2)
+  end
+
   def users_not_connected
     User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
   end
