@@ -22,8 +22,9 @@ class Geocoding
     deg * (Math::PI / 180)
   end
 
-  def self.find_coords_with_city
-    resp = RestClient.get("https://api.mapbox.com/geocoding/v5/mapbox.places/Portland,OR.json?access_token=#{Rails.application.credentials.mapbox[:key]}")
+  def self.find_coords_with_city(location)
+    location = location.split(" ").join("&")
+    resp = RestClient.get("https://api.mapbox.com/geocoding/v5/mapbox.places/#{location}.json?access_token=#{Rails.application.credentials.mapbox[:key]}")
     coords = JSON.parse(resp)["features"][0]["center"].reverse
     
   end
