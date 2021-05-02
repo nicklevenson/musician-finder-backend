@@ -182,21 +182,24 @@ class User < ApplicationRecord
 
 
   def tags_attributes=(tags_attributes)
+    self.tags.delete_all
     tags_attributes.each do |tag_attribute|
-      tag = Tag.find_or_create_by(tag_attribute)
-      self.tags << tag
+      tag = Tag.find_or_create_by(name: tag_attribute["name"])
+      self.tags << tag unless self.tags.include?(tag)
     end
   end
   def genres_attributes=(genres_attributes)
+    self.genres.delete_all
     genres_attributes.each do |genre_attribute|
-      genre = Genre.find_or_create_by(genre_attribute)
-      self.genres << genre
+      genre = Genre.find_or_create_by(name: genre_attribute["name"])
+      self.genres << genre unless self.tags.include?(genre)
     end
   end
   def instruments_attributes=(instruments_attributes)
+    self.instruments.delete_all
     instruments_attributes.each do |instrument_attribute|
-      instrument = Instrument.find_or_create_by(instrument_attribute)
-      self.instruments << instrument
+      instrument = Instrument.find_or_create_by(name: instrument_attribute["name"])
+      self.instruments << instrument unless self.tags.include?(instrument)
     end
   end
 
