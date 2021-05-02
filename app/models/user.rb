@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :messages
   has_many :userchatrooms
   has_many :chatrooms, through: :userchatrooms
+
   has_many :connection_requests_as_requestor,
     foreign_key: :requestor_id,
     class_name: :Request
@@ -19,7 +20,6 @@ class User < ApplicationRecord
     class_name: :Request
 
   has_many :connections
-  # , ->(user) { where("connection_a_id = ? OR connection_b_id = ?", user.id, user.id) }
   has_many :a_connected_users, foreign_key: :connection_a_id, class_name: :Connection
   has_many :b_connected_users, foreign_key: :connection_b_id, class_name: :Connection
 
@@ -28,7 +28,7 @@ class User < ApplicationRecord
   validates :username, :email, presence: true
 
   after_create :new_user_notification
-
+  before_save :set_coords
   
 
   def connected_users
@@ -196,5 +196,13 @@ class User < ApplicationRecord
 
     def new_user_notification
       self.notifications << Notification.create(content: "Thanks for joining Matchup Music! We're excited to have you.")
+    end
+
+    def set_coords
+      if self.location
+        coords = Geocoding.find_coords_with_city(self.location)
+        self.lat = coords[0]
+        self.lng = coords[1]
+      end
     end
 end
