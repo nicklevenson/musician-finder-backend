@@ -1,11 +1,11 @@
 class User < ApplicationRecord
-  has_many :usertags
+  has_many :usertags, dependent: :destroy
   has_many :tags, through: :usertags
-  has_many :userinstruments
+  has_many :userinstruments, dependent: :destroy
   has_many :instruments, through: :userinstruments
-  has_many :usergenres
+  has_many :usergenres, dependent: :destroy
   has_many :genres, through: :usergenres
-  has_many :notifications
+  has_many :notifications, dependent: :destroy
   has_many :posts
   has_many :messages
   has_many :userchatrooms
@@ -139,7 +139,7 @@ class User < ApplicationRecord
       resp = RestClient.get("https://api.spotify.com/v1/me/top/artists", header)
       items = JSON.parse(resp)['items']
       if items[0]
-        # self.tags.delete_by(tag_type: "spotify_artist")
+        remove_old_spotify_tags
         items.each do |i|
           name = i["name"]
           tag = Tag.find_or_create_by(name: name)
@@ -151,6 +151,13 @@ class User < ApplicationRecord
           self.tags << tag
         end
       end
+    end
+  end
+
+  def remove_old_spotify_tags
+    tags = self.tags.where(tag_type: "spotify_artist")
+    tags.each do |t|
+      self.tags.delete(t)
     end
   end
 
