@@ -90,18 +90,20 @@ class User < ApplicationRecord
 
   def user_distance(user_id)
     other_user = User.find(user_id)
-    other_user_coords = Geocoding.find_coords_with_city(other_user.location)
-    my_location = Geocoding.find_coords_with_city(self.location)
-    lat1 = other_user_coords[0]
-    lng1 = other_user_coords[1]
-    lat2 = my_location[0]
-    lng2 = my_location[1]
-    Geocoding.get_distance_between(lat1, lng1, lat2, lng2)
+    if self.lat && self.lng && other_user.lat && other_user.lng
+      lat1 = other_user.lat
+      lng1 = other_user.lng
+      lat2 = self.lat
+      lng2 = self.lng
+      Geocoding.get_distance_between(lat1, lng1, lat2, lng2)
+    else
+      1000
+    end
   end
 
   def is_in_range(user_id, range)
-    other_user = User.find(user_id)
-    if Geocoding.get_distance_between(lat1, lng1, lat2, lng2) < range
+    #range in miles
+    if user_distance(user_id) <= range
       true
     else
       false
