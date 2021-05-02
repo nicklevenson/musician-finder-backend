@@ -139,7 +139,7 @@ class User < ApplicationRecord
       resp = RestClient.get("https://api.spotify.com/v1/me/top/artists", header)
       items = JSON.parse(resp)['items']
       if items[0]
-        self.tags.where(tag_type: "spotify_artist").delete_all
+        # self.tags.delete_by(tag_type: "spotify_artist")
         items.each do |i|
           name = i["name"]
           tag = Tag.find_or_create_by(name: name)
