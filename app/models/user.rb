@@ -139,6 +139,7 @@ class User < ApplicationRecord
       resp = RestClient.get("https://api.spotify.com/v1/me/top/artists", header)
       items = JSON.parse(resp)['items']
       if items[0]
+        self.tags.where(tag_type: "spotify_artist").delete_all
         items.each do |i|
           name = i["name"]
           tag = Tag.find_or_create_by(name: name)
@@ -147,9 +148,7 @@ class User < ApplicationRecord
           tag.spotify_link = i["href"]
           tag.spotify_uri = i["uri"]
           tag.save
-          if !self.tags.include?(tag)
-            self.tags << tag
-          end
+          self.tags << tag
         end
       end
     end
