@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authorized, except: [:index, :create, :show, :get_user_chatrooms]
+  before_action :authorized, except: [:index, :create, :show]
   before_action :set_user, except: [:index, :create]
 
   # GET /users
