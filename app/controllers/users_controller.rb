@@ -15,7 +15,8 @@ class UsersController < ApplicationController
   end
 
   def get_similar_tags
-    render json: MultiJson.dump(@user.similar_tags(params[:other_user_id])[:similar_tags])
+    similar_tags = @user.similar_tags(params[:other_user_id])[:similar_tags]
+    render json: MultiJson.dump(similar_tags)
   end
 
   def get_connected_users
