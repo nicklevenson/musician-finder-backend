@@ -33,7 +33,7 @@ class UsersController < ApplicationController
   end
 
   def get_user_chatrooms
-    render json: MultiJson.dump(@user.chatrooms, include: [:messages => {
+    render json: MultiJson.dump(@user.chatrooms, include: [:users, :messages => {
       include: [:user => {only: [:username, :id, :location, :photo, :providerImage]}]
       }])
   end
