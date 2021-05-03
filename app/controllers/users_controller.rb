@@ -6,32 +6,32 @@ class UsersController < ApplicationController
   def index
     @users = User.all
 
-    render json: @users, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests]
+    render json: MultiJson.dump(@users, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests])
   end
 
   # GET /users/1
   def show
-    render json: @user, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications, :tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}]
+    render json: MultiJson.dump(@user, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications, :tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
   end
 
   def get_similar_tags
-    render json: @user.similar_tags(params[:other_user_id])[:similar_tags]
+    render json: MultiJson.dump(@user.similar_tags(params[:other_user_id])[:similar_tags])
   end
 
   def get_connected_users
-    render json: @user.connected_users_with_tags, methods: [:connected_users_with_tags]
+    render json: MultiJson.dump(@user.connected_users_with_tags, methods: [:connected_users_with_tags])
   end
 
   def get_recommended_users
-    render json: @user.recommended_users, include: :connected_users_with_tags
+    render json: MultiJson.dump(@user.recommended_users, include: :connected_users_with_tags)
   end
 
   def get_incoming_requests
-    render json: @user.incoming_pending_requests, methods: [:connected_users_with_tags]
+    render json: MultiJson.dump(@user.incoming_pending_requests, methods: [:connected_users_with_tags])
   end
 
   def get_user_chatrooms
-    render json: @user.chatrooms, include: :messages
+    render json: MultiJson.dump(@user.chatrooms, include: :messages)
   end
 
   # POST /users
