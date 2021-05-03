@@ -30,9 +30,12 @@ class UsersController < ApplicationController
     render json: @user.incoming_pending_requests, methods: [:connected_users_with_tags]
   end
 
+  def get_user_chatrooms
+    render json: @user.chatrooms, include: :messages
+  end
+
   # POST /users
   def create
- 
     user = User.find_or_create_by(uid: auth['uid'], provider: auth['provider']) do |u|
       u.providerImage = auth['info']['image']
       u.username = auth['info']['name']

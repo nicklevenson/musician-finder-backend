@@ -31,6 +31,15 @@ class User < ApplicationRecord
   before_save :set_coords
   
 
+ 
+
+  def recommended_users
+    similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name.downcase}.intersection(self.tags.map{|tag| tag.name.downcase})).length}.reverse()[0..50]
+    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
+    filtered_self_and_connections.map{|u| self.similar_tags(u.id)}
+  end
+
+  #connection methods
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
@@ -40,6 +49,7 @@ class User < ApplicationRecord
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
   end
+
   def request_connection(user_id)
     if !(connected_users.include?(User.find(user_id)))
       request = Request.find_or_create_by(requestor_id: self.id, receiver_id: user_id)
@@ -52,8 +62,6 @@ class User < ApplicationRecord
     else
       "Already Connected"
     end
-
-  
   end
 
   def incoming_pending_requests
@@ -82,12 +90,25 @@ class User < ApplicationRecord
     request.destroy
   end
 
-  def recommended_users
-    similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name.downcase}.intersection(self.tags.map{|tag| tag.name.downcase})).length}.reverse()[0..50]
-    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
-    filtered_self_and_connections.map{|u| self.similar_tags(u.id)}
+  def users_not_connected
+    User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
   end
 
+  def similar_tags(user_id)
+    other_user = User.find(user_id)
+    {user: other_user, similar_tags: self.tags.map{|tag| tag.name.downcase}.intersection(other_user.tags.map{|tag| tag.name.downcase})}
+  end
+
+  def rejected_users
+    User.where(id: self.rejections.map{|r| r.rejected_id})
+  end
+  
+  def reject_user(user_id)
+    self.rejections.build(rejected_id: user_id, rejector_id: self.id)
+    self.save
+  end
+
+  # geolocation methods
   def user_distance(user_id)
     other_user = User.find(user_id)
     if self.lat && self.lng && other_user.lat && other_user.lng
@@ -110,25 +131,7 @@ class User < ApplicationRecord
     end
   end
 
-  def users_not_connected
-    User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
-  end
-
-  def similar_tags(user_id)
-    other_user = User.find(user_id)
-    {user: other_user, similar_tags: self.tags.map{|tag| tag.name.downcase}.intersection(other_user.tags.map{|tag| tag.name.downcase})}
-  end
-
-
-  def rejected_users
-    User.where(id: self.rejections.map{|r| r.rejected_id})
-  end
-  
-  def reject_user(user_id)
-    self.rejections.build(rejected_id: user_id, rejector_id: self.id)
-    self.save
-  end
-
+  #spotify methods
 
   def fetch_spotify_data
     if self.provider === 'spotify'
@@ -181,6 +184,7 @@ class User < ApplicationRecord
   end
 
 
+  # nested helpers
   def tags_attributes=(tags_attributes)
     self.tags.delete_all
     tags_attributes.each do |tag_attribute|
