@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  # before_action :authorized
+  before_action :authorized
   def create
     message = Message.new(message_params)
     if message.save
