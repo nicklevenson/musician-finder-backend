@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authorized, except: [:index, :create, :show]
+  before_action :authorized, except: [:index, :create, :show, :get_user_chatrooms]
   before_action :set_user, except: [:index, :create]
 
   # GET /users
@@ -11,7 +11,9 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    render json: MultiJson.dump(@user, except: [:token, :refresh_token], methods: [:connected_users_with_tags, :outgoing_pending_requests], include: [:notifications, :tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
+    render json: MultiJson.dump(@user, except: [:token, :refresh_token], 
+      methods: [:connected_users_with_tags, :outgoing_pending_requests], 
+      include: [:notifications, :tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
   end
 
   def get_similar_tags
@@ -31,7 +33,9 @@ class UsersController < ApplicationController
   end
 
   def get_user_chatrooms
-    render json: MultiJson.dump(@user.chatrooms, include: :messages)
+    render json: MultiJson.dump(@user.chatrooms, include: [:messages => {
+      include: [:user => {only: [:username, :id, :location, :photo, :providerImage]}]
+      }])
   end
 
   # POST /users
