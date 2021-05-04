@@ -13,7 +13,7 @@ class UsersController < ApplicationController
   def show
     render json: MultiJson.dump(@user, except: [:token, :refresh_token], 
       methods: [:connected_users_with_tags, :outgoing_pending_requests], 
-      include: [:notifications, :tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
+      include: [:tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
   end
 
   def get_similar_tags
@@ -36,6 +36,10 @@ class UsersController < ApplicationController
     render json: MultiJson.dump(@user.chatrooms, include: [:users, :messages => {
       include: [:user => {only: [:username, :id, :location, :photo, :providerImage]}]
       }])
+  end
+
+  def get_user_notifications
+    render json: MultiJson.dump(@user.notifications)
   end
 
   # POST /users
