@@ -33,8 +33,14 @@ class User < ApplicationRecord
 
  
 
-  def recommended_users
-    similar_users = User.all.sort_by{|user| (user.tags.map{|tag| tag.name.downcase}.intersection(self.tags.map{|tag| tag.name.downcase})).length}.reverse()[0..50]
+  def recommended_users(parameters)
+    allUsers = User.all
+    if parameters["mileRange"]
+      if parameters["mileRange"] < 500
+        allUsers = allUsers.filter{|user| self.is_in_range(user.id, parameters["mileRange"])}
+      end
+    end
+    similar_users = allUsers.sort_by{|user| (user.tags.map{|tag| tag.name.downcase}.intersection(self.tags.map{|tag| tag.name.downcase})).length}.reverse()[0..50]
     filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
     filtered_self_and_connections.map{|u| self.similar_tags(u.id)}
   end
@@ -118,7 +124,7 @@ class User < ApplicationRecord
       lng2 = self.lng
       Geocoding.get_distance_between(lat1, lng1, lat2, lng2)
     else
-      1000
+      500
     end
   end
 

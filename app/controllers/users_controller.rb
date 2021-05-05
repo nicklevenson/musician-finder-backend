@@ -25,7 +25,8 @@ class UsersController < ApplicationController
   end
 
   def get_recommended_users
-    render json: MultiJson.dump(@user.recommended_users, methods: [:connected_users_with_tags])
+    reccomendations = @user.recommended_users(recommended_users_params)
+    render json: MultiJson.dump(reccomendations, methods: [:connected_users_with_tags])
   end
 
   def get_incoming_requests
@@ -111,6 +112,9 @@ class UsersController < ApplicationController
       params.require(:user).permit(:bio, :location, tags_attributes: [:name, :tag_type, :spotify_uri, :spotify_image_url, :spotify_link], genres_attributes: [:name], instruments_attributes: [:name])
     end
 
+    def recommended_users_params
+      params.require(:filterParamsObject).permit(:noFilter, :mileRange)
+    end
 
     def auth
       request.env['omniauth.auth']
