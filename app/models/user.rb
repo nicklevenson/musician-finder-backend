@@ -28,7 +28,7 @@ class User < ApplicationRecord
   validates :username, :email, presence: true
 
   after_create :new_user_notification
-  before_save :set_coords
+
   
 
  
