@@ -147,9 +147,9 @@ class User < ApplicationRecord
           name = i["name"]
           tag = Tag.find_or_create_by(name: name)
           tag.tag_type = "spotify_artist"
-          tag.spotify_image_url = i["images"][0]["url"]
-          tag.spotify_link = i["href"]
-          tag.spotify_uri = i["uri"]
+          tag.image_url = i["images"][0]["url"]
+          tag.link = i["href"]
+          tag.uri = i["uri"]
           tag.save
           self.tags << tag
         end
