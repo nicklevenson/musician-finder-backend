@@ -8,16 +8,16 @@ class MessagesController < ApplicationController
   end
 
   def make_read
-    message = Message.find(params[:message_id])
-    chatroom = message.chatroom
+    chatroom = Chatroom.find(params[:chatroom_id])
     messages_to_make_read = chatroom.messages.select{|m| m.user_id != current_user.id}
     messages_to_make_read.each do |mes|
       mes.read = true
       mes.save
     end
-    if message.save
-      render json: message
+    if chatroom.save
+      render json: chatroom
     end
+
   end
   private
 
