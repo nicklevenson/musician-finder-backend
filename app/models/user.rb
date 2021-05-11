@@ -44,7 +44,7 @@ class User < ApplicationRecord
                       user.tags.includes(:users).where(:users => {id: self.id}).length
                     end
                     .reverse()       
-    byebug
+
     filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
    
   end
