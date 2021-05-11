@@ -29,21 +29,14 @@ class User < ApplicationRecord
 
   after_create :new_user_notification
 
-  
-
- 
 
   def recommended_users(parameters)
-    allUsers = User.where('id != ?', self.id)
+    similar_users = similarly_tagged_users
     if parameters["mileRange"]
       if parameters["mileRange"] < 500
-        allUsers = allUsers.filter{|user| self.is_in_range(user.id, parameters["mileRange"])}
+        similar_users = similar_users.filter{|user| self.is_in_range(user.id, parameters["mileRange"])}
       end
-    end
-    similar_users = allUsers.sort_by do |user|
-                      user.tags.includes(:users).where(:users => {id: self.id}).length
-                    end
-                    .reverse()       
+    end    
 
     filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
    
@@ -79,8 +72,7 @@ class User < ApplicationRecord
   end
 
   def incoming_pending_requests
-    User.where(id:  self.connection_requests_as_receiver.where("accepted = false").map{|request|request.requestor_id})
-
+    User.where(id: self.connection_requests_as_receiver.where("accepted = false").map{|request|request.requestor_id})
   end
 
   def outgoing_pending_requests
@@ -230,5 +222,25 @@ class User < ApplicationRecord
         self.lat = coords[0]
         self.lng = coords[1]
       end
+    end
+
+
+    def similarly_tagged_users
+      conn = ActiveRecord::Base
+      sql2 = <<~SQL
+        SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
+        FROM users AS u
+          LEFT OUTER JOIN (
+            SELECT user_id, COUNT(*) AS n
+            FROM usertags
+            WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
+            GROUP BY user_id
+          ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
+          WHERE #{conn.sanitize_sql_array(["u.id != ?", self.id])}
+          ORDER BY similarity_score DESC
+          LIMIT 50
+      SQL
+      sanatized = ActiveRecord::Base::sanitize_sql(sql2)
+      self.class.find_by_sql(sanatized)
     end
 end
