@@ -34,26 +34,34 @@ class User < ApplicationRecord
  
 
   def recommended_users(parameters)
-    allUsers = User.all
+    allUsers = User.where('id != ?', self.id)
     if parameters["mileRange"]
       if parameters["mileRange"] < 500
         allUsers = allUsers.filter{|user| self.is_in_range(user.id, parameters["mileRange"])}
       end
     end
-    similar_users = allUsers.sort_by{|user| (user.tags.map{|tag| tag.name.downcase}.intersection(self.tags.map{|tag| tag.name.downcase})).length}.reverse()[0..50]
+    similar_users = allUsers.sort_by do |user|
+                      user.tags.includes(:users).where(:users => {id: self.id}).length
+                    end
+                    .reverse()       
+    byebug
     filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
-    filtered_self_and_connections.map{|u| self.similar_tags(u.id)}
+   
   end
 
   #connection methods
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    connections.map{|c| c.connection_a_id != self.id ? User.find(c.connection_a_id) : User.find(c.connection_b_id)}
+    User.where('id = ?', connections.map{|c| c.connection_a_id != self.id ? c.connection_a_id : c.connection_b_id})
   end
 
   def connected_users_with_tags
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
     connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
+  end
+
+  def users_not_connected
+    User.where('id != ?', self.id).where.not(id: self.connected_users.select(:id))
   end
 
   def request_connection(user_id)
@@ -96,13 +104,9 @@ class User < ApplicationRecord
     request.destroy
   end
 
-  def users_not_connected
-    User.all.select{|u|self.connected_users.exclude?(u) === true && u != self}
-  end
-
   def similar_tags(user_id)
     other_user = User.find(user_id)
-    {user: other_user, similar_tags: self.tags.map{|tag| tag.name.downcase}.intersection(other_user.tags.map{|tag| tag.name.downcase})}
+    other_user.tags.includes(:users).where(:users => {id: self.id})
   end
 
   def rejected_users

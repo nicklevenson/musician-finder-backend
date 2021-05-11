@@ -17,7 +17,7 @@ class UsersController < ApplicationController
   end
 
   def get_similar_tags
-    render json: MultiJson.dump(@user.similar_tags(params[:other_user_id])[:similar_tags])
+    render json: MultiJson.dump(@user.similar_tags(params[:other_user_id]))
   end
 
   def get_connected_users
@@ -25,8 +25,10 @@ class UsersController < ApplicationController
   end
 
   def get_recommended_users
-    reccomendations = @user.recommended_users(recommended_users_params)
-    render json: MultiJson.dump(reccomendations, methods: [:connected_users_with_tags])
+    recommendations = @user.recommended_users(recommended_users_params)
+    if recommendations
+      render json: MultiJson.dump(recommendations, methods: [:connected_users_with_tags])
+    end
   end
 
   def get_incoming_requests
