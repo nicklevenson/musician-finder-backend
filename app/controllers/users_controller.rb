@@ -33,7 +33,7 @@ class UsersController < ApplicationController
   end
 
   def get_incoming_requests
-    render json: MultiJson.dump(@user.incoming_pending_requests, methods: [:connected_users_with_tags])
+    render json: MultiJson.dump(@user.incoming_pending_requests, methods: [:connected_users])
   end
 
   def get_user_chatrooms

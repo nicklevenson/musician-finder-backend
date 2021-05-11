@@ -79,7 +79,8 @@ class User < ApplicationRecord
   end
 
   def incoming_pending_requests
-    self.connection_requests_as_receiver.where("accepted = false").map{|request| similar_tags(request.requestor_id)}
+    User.where(id:  self.connection_requests_as_receiver.where("accepted = false").map{|request|request.requestor_id})
+
   end
 
   def outgoing_pending_requests
