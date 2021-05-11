@@ -21,13 +21,14 @@ class UsersController < ApplicationController
   end
 
   def get_connected_users
-    render json: MultiJson.dump(@user.connected_users_with_tags, methods: [:connected_users_with_tags])
+    render json: MultiJson.dump(@user.connected_users, include: :tags)
   end
 
   def get_recommended_users
     recommendations = @user.recommended_users(recommended_users_params)
+
     if recommendations
-      render json: MultiJson.dump(recommendations, methods: [:connected_users_with_tags])
+      render json: MultiJson.dump(recommendations, include: :tags)
     end
   end
 
