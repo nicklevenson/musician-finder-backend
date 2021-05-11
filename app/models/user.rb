@@ -31,15 +31,14 @@ class User < ApplicationRecord
 
 
   def recommended_users(parameters)
-    similar_users = similarly_tagged_users
-    if parameters["mileRange"]
-      if parameters["mileRange"] < 500
-        similar_users = similar_users.filter{|user| self.is_in_range(user.id, parameters["mileRange"])}
-      end
-    end    
-
-    filtered_self_and_connections = similar_users.filter{|user| users_not_connected.include?(user) && !self.rejected_users.include?(user)}
    
+    if parameters["mileRange"] && parameters["mileRange"] < 500
+      similar_users = similarly_tagged_users(parameters["mileRange"])
+    else
+      similar_users = similarly_tagged_users
+    end 
+   similar_users
+
   end
 
   #connection methods
@@ -112,8 +111,7 @@ class User < ApplicationRecord
   end
 
   # geolocation methods
-  def user_distance(user_id)
-    other_user = User.find(user_id)
+  def user_distance(other_user)
     if self.lat && self.lng && other_user.lat && other_user.lng
       lat1 = other_user.lat
       lng1 = other_user.lng
@@ -125,13 +123,24 @@ class User < ApplicationRecord
     end
   end
 
-  def is_in_range(user_id, range)
+  def is_in_range(other_user, range)
     #range in miles
-    if user_distance(user_id) <= range
+    if user_distance(other_user) <= range
       true
     else
       false
     end
+  end
+
+  def users_not_in_range(users, range)
+    users.select do |id|
+      if user_distance(id) <= range
+        false
+      else
+        true
+      end
+    end
+    .map{|user|user.id}
   end
 
   #spotify methods
@@ -225,8 +234,9 @@ class User < ApplicationRecord
     end
 
 
-    def similarly_tagged_users
+    def similarly_tagged_users(range = 500)
       conn = ActiveRecord::Base
+  
       sql2 = <<~SQL
         SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
         FROM users AS u
@@ -236,9 +246,10 @@ class User < ApplicationRecord
             WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
             GROUP BY user_id
           ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
-          WHERE #{conn.sanitize_sql_array(["u.id != ?", self.id])}
+          WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.connected_users.ids.push(self.id)])}
+          AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
           ORDER BY similarity_score DESC
-          LIMIT 50
+          LIMIT 100
       SQL
       sanatized = ActiveRecord::Base::sanitize_sql(sql2)
       self.class.find_by_sql(sanatized)
