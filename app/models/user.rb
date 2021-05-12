@@ -219,6 +219,29 @@ class User < ApplicationRecord
     end
   end
 
+
+  def similarly_tagged_users(range = 500)
+    conn = ActiveRecord::Base
+    connected_ids = self.connected_users.map{|user|user.id}
+    no_ids = connected_ids.push(self.id)
+    sql2 = <<~SQL
+      SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
+      FROM users AS u
+        LEFT OUTER JOIN (
+          SELECT user_id, COUNT(*) AS n
+          FROM usertags
+          WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
+          GROUP BY user_id
+        ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
+        WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
+        AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
+        ORDER BY similarity_score DESC
+        LIMIT 50
+    SQL
+    sanatized = ActiveRecord::Base::sanitize_sql(sql2)
+    self.class.find_by_sql(sanatized)
+  end
+
   private
 
     def new_user_notification
@@ -234,25 +257,4 @@ class User < ApplicationRecord
     end
 
 
-    def similarly_tagged_users(range = 500)
-      conn = ActiveRecord::Base
-      connected_ids = self.connected_users.map{|user|user.id}
-      no_ids = connected_ids.push(self.id)
-      sql2 = <<~SQL
-        SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
-        FROM users AS u
-          LEFT OUTER JOIN (
-            SELECT user_id, COUNT(*) AS n
-            FROM usertags
-            WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
-            GROUP BY user_id
-          ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
-          WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
-          AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
-          ORDER BY similarity_score DESC
-          LIMIT 50
-      SQL
-      sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-      self.class.find_by_sql(sanatized)
-    end
 end
