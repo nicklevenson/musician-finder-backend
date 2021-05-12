@@ -252,6 +252,6 @@ class User < ApplicationRecord
           LIMIT 50
       SQL
       sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-      User.find_by_sql(sanatized)
+      self.class.find_by_sql(sanatized)
     end
 end
