@@ -132,12 +132,12 @@ class User < ApplicationRecord
     end
   end
 
-  def users_not_in_range(users, range)
-    users.select do |id|
-      if user_distance(id) <= range
-        false
-      else
+  def users_in_range(users, range)
+    users.select do |user|
+      if user_distance(user) <= range
         true
+      else
+        false
       end
     end
     .map{|user|user.id}
@@ -234,7 +234,7 @@ class User < ApplicationRecord
           GROUP BY user_id
         ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
         WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
-        AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
+        AND #{conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(User.all, range)])}
         ORDER BY similarity_score DESC
         LIMIT 50
     SQL
