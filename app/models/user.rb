@@ -44,7 +44,7 @@ class User < ApplicationRecord
   #connection methods
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    User.where('id = ?', connections.map{|c| c.connection_a_id != self.id ? c.connection_a_id : c.connection_b_id})
+    User.where(id: connections.map{|c| c.connection_a_id != self.id ? c.connection_a_id : c.connection_b_id})
   end
 
   def connected_users_with_tags
@@ -53,7 +53,7 @@ class User < ApplicationRecord
   end
 
   def users_not_connected
-    User.where('id != ?', self.id).where.not(id: self.connected_users.select(:id))
+    User.where.not(id: self.id).where.not(id: self.connected_users.select(:id))
   end
 
   def request_connection(user_id)
