@@ -236,7 +236,7 @@ class User < ApplicationRecord
 
     def similarly_tagged_users(range = 500)
       conn = ActiveRecord::Base
-      connected_ids = self.connected_users.ids
+      connected_ids = self.connected_users.map{|user|user.id}
       no_ids = connected_ids.push(self.id)
       sql2 = <<~SQL
         SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
