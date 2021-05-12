@@ -249,9 +249,9 @@ class User < ApplicationRecord
           WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.connected_users.ids.push(self.id)])}
           AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
           ORDER BY similarity_score DESC
-          LIMIT 100
+          LIMIT 50
       SQL
       sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-      self.class.find_by_sql(sanatized)
+      User.find_by_sql(sanatized)
     end
 end
