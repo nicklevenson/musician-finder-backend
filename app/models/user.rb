@@ -240,8 +240,6 @@ class User < ApplicationRecord
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
     self.class.find_by_sql(sanatized)
-
-    byebug
   end
 
   private
