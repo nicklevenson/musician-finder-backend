@@ -236,7 +236,7 @@ class User < ApplicationRecord
 
     def similarly_tagged_users(range = 500)
       conn = ActiveRecord::Base
-  
+      no_ids = self.connected_users.ids.push(self.id)
       sql2 = <<~SQL
         SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
         FROM users AS u
@@ -246,7 +246,7 @@ class User < ApplicationRecord
             WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
             GROUP BY user_id
           ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
-          WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.connected_users.ids.push(self.id)])}
+          WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
           AND #{conn.sanitize_sql_array(["u.id NOT IN(?)", self.users_not_in_range(User.all, range)])}
           ORDER BY similarity_score DESC
           LIMIT 50
