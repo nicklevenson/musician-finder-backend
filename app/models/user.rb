@@ -215,13 +215,13 @@ class User < ApplicationRecord
 
   def similarly_tagged_users(range: nil, instruments: nil, genres: nil)
     conn = ActiveRecord::Base
-
-    no_ids = self.connected_users.map{|user|user.id}.push(self.id)
+    all_users = User.all
+    no_ids = self.connected_users.ids.push(self.id)
 
     instrument_user_ids = instruments ? Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id) : nil
     instrument_query = instrument_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", instrument_user_ids]) : "true"
 
-    range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(User.all, range)]) : "true"
+    range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(all_users, range)]) : "true"
 
     genre_user_ids = genres ? Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id) : nil
     genre_query = genre_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids]) : "true"
@@ -243,7 +243,7 @@ class User < ApplicationRecord
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    self.class.where(id: User.find_by_sql(sanatized))
+    self.class.where(id: all_users.find_by_sql(sanatized))
   end
 
   private
