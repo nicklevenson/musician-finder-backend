@@ -37,6 +37,7 @@ class UsersController < ApplicationController
   end
 
   def get_user_chatrooms
+    @user = User.includes(:chatrooms => [{:userchatrooms => :user}, :users, {:messages => :user}]).find(params[:id])
     render json: MultiJson.dump(@user.chatrooms, include: [:users, :messages => {
       include: [:user => {only: [:username, :id, :location, :photo, :providerImage]}]
       }])
@@ -107,11 +108,7 @@ class UsersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.includes(
-                :notifications,
-                :tags, :genres, :instruments, 
-                :chatrooms => [{:messages => :user}, :users]
-              ).find(params[:id])
+      @user = User.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
