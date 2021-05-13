@@ -31,13 +31,11 @@ class User < ApplicationRecord
 
 
   def recommended_users(parameters)
-   
-    if parameters["mileRange"] && parameters["mileRange"] < 500
-      similar_users = similarly_tagged_users(range: parameters["mileRange"])
-    else
-      similar_users = similarly_tagged_users
-    end 
-   similar_users
+    range = parameters["mileRange"] && parameters["mileRange"] < 500 ? parameters["mileRange"] : nil
+    instruments = parameters["instruments"] || nil
+    genres = parameters["genres"] || nil
+      
+    similar_users = similarly_tagged_users(range: range, instruments: instruments, genres: genres)
 
   end
 
