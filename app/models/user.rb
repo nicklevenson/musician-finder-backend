@@ -33,7 +33,7 @@ class User < ApplicationRecord
   def recommended_users(parameters)
    
     if parameters["mileRange"] && parameters["mileRange"] < 500
-      similar_users = similarly_tagged_users(parameters["mileRange"])
+      similar_users = similarly_tagged_users(range: parameters["mileRange"])
     else
       similar_users = similarly_tagged_users
     end 
@@ -220,12 +220,21 @@ class User < ApplicationRecord
   end
 
 
-  def similarly_tagged_users(range = 500)
+  def similarly_tagged_users(range: nil, instruments: nil, genres: nil)
     conn = ActiveRecord::Base
-    connected_ids = self.connected_users.map{|user|user.id}
-    no_ids = connected_ids.push(self.id)
+
+    no_ids = self.connected_users.map{|user|user.id}.push(self.id)
+
+    instrument_user_ids = instruments ? Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id) : nil
+    instrument_query = instrument_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", instrument_user_ids]) : "true"
+
+    range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(User.all, range)]) : "true"
+
+    genre_user_ids = genres ? Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id) : nil
+    genre_query = genre_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids]) : "true"
+
     sql2 = <<~SQL
-      SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
+      SELECT u.id, COALESCE(matching_tag_counts.n, 0) AS similarity_score
       FROM users AS u
         LEFT OUTER JOIN (
           SELECT user_id, COUNT(*) AS n
@@ -234,12 +243,14 @@ class User < ApplicationRecord
           GROUP BY user_id
         ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
         WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
-        AND #{conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(User.all, range)])}
+        AND #{range_query}
+        AND #{instrument_query}
+        AND #{genre_query}
         ORDER BY similarity_score DESC
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    self.class.find_by_sql(sanatized)
+    self.class.where(id: User.find_by_sql(sanatized))
   end
 
   private
