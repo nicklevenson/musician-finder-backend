@@ -12,7 +12,7 @@ class UsersController < ApplicationController
   # GET /users/1
   def show
     render json: MultiJson.dump(@user, except: [:token, :refresh_token], 
-      methods: [:connected_users_with_tags, :outgoing_pending_requests], 
+      methods: [:connected_users, :outgoing_pending_requests], 
       include: [:tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
   end
 
@@ -107,7 +107,11 @@ class UsersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.find(params[:id])
+      @user = User.includes(
+                :notifications,
+                :tags, :genres, :instruments, 
+                :chatrooms => [{:messages => :user}, :users]
+              ).find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

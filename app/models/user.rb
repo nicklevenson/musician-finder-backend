@@ -42,12 +42,7 @@ class User < ApplicationRecord
   #connection methods
   def connected_users
     connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    User.where(id: connections.map{|c| c.connection_a_id != self.id ? c.connection_a_id : c.connection_b_id})
-  end
-
-  def connected_users_with_tags
-    connections = Connection.where("connection_a_id = ? OR connection_b_id = ?", self.id, self.id)
-    connections.map{|c| c.connection_a_id != self.id ? similar_tags(c.connection_a_id) : similar_tags(c.connection_b_id)}
+    User.includes(:tags).where(id: connections.map{|c| c.connection_a_id != self.id ? c.connection_a_id : c.connection_b_id})
   end
 
   def users_not_connected
