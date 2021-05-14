@@ -222,7 +222,7 @@ class User < ApplicationRecord
 
     instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
     genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
-    genre_instrument_query = instrument_user_ids || genre_user_ids ? 
+    genre_instrument_query = !instrument_user_ids.empty? || !genre_user_ids.empty? ?
                              conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids.concat(instrument_user_ids)]) 
                              : "true"
 
