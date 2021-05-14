@@ -224,7 +224,7 @@ class User < ApplicationRecord
     genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
     genre_instrument_query = !instrument_user_ids.empty? || !genre_user_ids.empty? ?
                              conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids.concat(instrument_user_ids)]) 
-                             : "true"
+                             : "false"
 
     sql2 = <<~SQL
       SELECT u.id, COALESCE(matching_tag_counts.n, 0) AS similarity_score
