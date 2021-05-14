@@ -117,7 +117,7 @@ class UsersController < ApplicationController
     end
 
     def recommended_users_params
-      params.require(:filterParamsObject).permit(:noFilter, :mileRange, {:instruments => []}, :genres)
+      params.require(:filterParamsObject).permit(:noFilter, :mileRange, {:instruments => []}, {:genres => []})
     end
 
     def auth

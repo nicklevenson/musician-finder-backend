@@ -34,7 +34,7 @@ class User < ApplicationRecord
  
     range = parameters["mileRange"] && parameters["mileRange"] < 500 ? parameters["mileRange"] : nil
     instruments = parameters["instruments"] && parameters["instruments"].length > 0 ? parameters["instruments"] : nil
-    genres = parameters["genres"] || nil
+    genres = parameters["genres"] && parameters["genres"].length > 0 ? parameters["genres"] : nil
       
     similar_users = similarly_tagged_users(range: range, instruments: instruments, genres: genres)
 
@@ -218,14 +218,13 @@ class User < ApplicationRecord
     conn = ActiveRecord::Base
     all_users = User.all
     no_ids = self.connected_users.ids.push(self.id)
-
-    instrument_user_ids = instruments ? Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id) : nil
-    instrument_query = instrument_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", instrument_user_ids]) : "true"
-
     range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(all_users, range)]) : "true"
 
-    genre_user_ids = genres ? Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id) : nil
-    genre_query = genre_user_ids ? conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids]) : "true"
+    instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
+    genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
+    genre_instrument_query = instrument_user_ids || genre_user_ids ? 
+                             conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids.concat(instrument_user_ids)]) 
+                             : "true"
 
     sql2 = <<~SQL
       SELECT u.id, COALESCE(matching_tag_counts.n, 0) AS similarity_score
@@ -238,8 +237,7 @@ class User < ApplicationRecord
         ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
         WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
         AND #{range_query}
-        AND #{instrument_query}
-        AND #{genre_query}
+        AND #{genre_instrument_query}
         ORDER BY similarity_score DESC
         LIMIT 50
     SQL
