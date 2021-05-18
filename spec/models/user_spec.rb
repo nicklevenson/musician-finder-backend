@@ -97,17 +97,17 @@ RSpec.describe User, type: :model do
 
     describe("recommended users") do
       before do
-        tag1 = Tag.create(name: "rock")
-        tag2 = Tag.create(name: "country")
-        tag3 = Tag.create(name: "blues")
-        tag4 = Tag.create(name: "house")
-        tag5 = Tag.create(name: "disco")
+        @tag1 = Tag.create(name: "rock")
+        @tag2 = Tag.create(name: "country")
+        @tag3 = Tag.create(name: "blues")
+        @tag4 = Tag.create(name: "house")
+        @tag5 = Tag.create(name: "disco")
 
-        tag1.users << [@user1, @user2]
-        tag2.users << [@user1, @user2]
-        tag3.users << [@user1]
-        tag4.users << [@user3]
-        tag5.users << [@user2, @user3]
+        @tag1.users << [@user1, @user2]
+        @tag2.users << [@user1, @user2]
+        @tag3.users << [@user1]
+        @tag4.users << [@user3]
+        @tag5.users << [@user2, @user3]
 
         Tag.all.each{|tag|tag.save}
         User.all.each{|user|user.save}
@@ -120,6 +120,8 @@ RSpec.describe User, type: :model do
         expect(@user2.recommended_users({}).last).to eq(@user3)
         expect(@user3.recommended_users({}).first).to eq(@user2)
         
+        expect(@user3.similar_tags(@user1.id)).to eq([])
+        expect(@user3.similar_tags(@user2.id).first).to eq(@tag5)
       end
     end
 

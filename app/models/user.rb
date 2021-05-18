@@ -242,7 +242,7 @@ class User < ApplicationRecord
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    User.includes(:instruments, :genres).find_by_sql(sanatized)
+    User.find_by_sql(sanatized)
   end
 
   private
