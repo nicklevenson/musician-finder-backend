@@ -28,7 +28,7 @@ class UsersController < ApplicationController
     recommendations = @user.recommended_users(recommended_users_params)
     
     if recommendations
-      render json: MultiJson.dump(recommendations)
+      render json: MultiJson.dump(recommendations, include: [:genres => {only: :name}, :instruments => {only: :name}])
     end
   end
 

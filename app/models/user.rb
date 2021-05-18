@@ -221,8 +221,9 @@ class User < ApplicationRecord
 
     instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
     genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
-    genre_instrument_query = !instrument_user_ids.empty? || !genre_user_ids.empty? ?
-                             conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids.concat(instrument_user_ids)]) 
+    combined_ids = genre_user_ids.concat(instrument_user_ids)
+    genre_instrument_query = !combined_ids.empty? ?
+                             conn.sanitize_sql_array(["u.id IN(?)", combined_ids]) 
                              : "true"
 
     sql2 = <<~SQL
@@ -241,7 +242,7 @@ class User < ApplicationRecord
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    self.class.where(id: all_users.find_by_sql(sanatized))
+    User.includes(:instruments, :genres).where(id: all_users.find_by_sql(sanatized))
   end
 
   private
