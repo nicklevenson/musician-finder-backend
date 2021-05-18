@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_04_225224) do
+ActiveRecord::Schema.define(version: 2021_05_18_182038) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -126,6 +126,12 @@ ActiveRecord::Schema.define(version: 2021_05_04_225224) do
     t.datetime "updated_at", precision: 6, null: false
     t.decimal "lng", precision: 10, scale: 6
     t.decimal "lat", precision: 10, scale: 6
+    t.string "soundcloud_link"
+    t.string "bandcamp_link"
+    t.string "youtube_link"
+    t.string "spotify_link"
+    t.string "apple_music_link"
+    t.string "instagram_link"
   end
 
   create_table "usertags", force: :cascade do |t|
