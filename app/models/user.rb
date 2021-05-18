@@ -245,19 +245,20 @@ class User < ApplicationRecord
     User.find_by_sql(sanatized)
   end
 
+  def set_coords
+    if self.location
+      coords = Geocoding.find_coords_with_city(self.location)
+      self.lat = coords[0]
+      self.lng = coords[1]
+    end
+  end
+
   private
 
     def new_user_notification
       self.notifications << Notification.create(content: "Thanks for joining Matchup Music! We're excited to have you.")
     end
 
-    def set_coords
-      if self.location
-        coords = Geocoding.find_coords_with_city(self.location)
-        self.lat = coords[0]
-        self.lng = coords[1]
-      end
-    end
 
 
 end

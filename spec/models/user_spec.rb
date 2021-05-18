@@ -3,9 +3,12 @@ require 'byebug'
 RSpec.describe User, type: :model do
 
   before do
-    @user1 = User.create(username: "hello", email: "hello.com", location: "LA")
-    @user2 = User.create(username: "hello2", email: "hello.com2", location: "LA2")
-    @user3 = User.create(username: "hello3", email: "hello.com3", location: "LA3")
+    @user1 = User.create(username: "hello", email: "hello.com", location: "Ashland, OR")
+    @user2 = User.create(username: "hello2", email: "hello.com2", location: "Portland, OR")
+    @user3 = User.create(username: "hello3", email: "hello.com3", location: "Seattle, WA")
+    @user1.set_coords
+    @user2.set_coords
+    @user3.set_coords
   end
   describe 'validations' do
     it { should validate_presence_of(:username) }
@@ -138,6 +141,14 @@ RSpec.describe User, type: :model do
         expect(@user3.notifications.length).to eq(2)
         expect(@user1.notifications.length).to eq(2)
       end 
+    end
+  end
+
+  describe "geolocation" do
+    it "can return a list of user ids in a mile radius" do
+      expect(@user2.users_in_range([@user1, @user3], 200)).to eq([@user3.id])
+      expect(@user2.users_in_range([@user1, @user3], 400)).to eq([@user1.id, @user3.id])
+      expect(@user3.users_in_range([@user1, @user2], 146)).to eq([@user2.id])
     end
   end
 
