@@ -29,7 +29,6 @@ class User < ApplicationRecord
 
   after_create :new_user_notification
 
-
   def recommended_users(parameters)
  
     range = parameters["mileRange"] && parameters["mileRange"] < 500 ? parameters["mileRange"] : nil
@@ -224,7 +223,7 @@ class User < ApplicationRecord
     genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
     genre_instrument_query = !instrument_user_ids.empty? || !genre_user_ids.empty? ?
                              conn.sanitize_sql_array(["u.id IN(?)", genre_user_ids.concat(instrument_user_ids)]) 
-                             : "false"
+                             : "true"
 
     sql2 = <<~SQL
       SELECT u.id, COALESCE(matching_tag_counts.n, 0) AS similarity_score
