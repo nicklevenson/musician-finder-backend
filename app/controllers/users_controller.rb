@@ -20,6 +20,14 @@ class UsersController < ApplicationController
     render json: MultiJson.dump(@user.similar_tags(params[:other_user_id]))
   end
 
+  def get_supporting_info
+    similar_tags = @user.similar_tags(params[:other_user_id])
+    instruments = @user.instruments.pluck(:name)
+    genres = @user.genres.pluck(:name)
+    info = {similar_tags: similar_tags, instruments: instruments, genres: genres}
+    render json: MultiJson.dump(info)
+  end
+
   def get_connected_users
     render json: MultiJson.dump(@user.connected_users, include: :tags)
   end
