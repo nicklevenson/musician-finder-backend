@@ -70,6 +70,7 @@ class UsersController < ApplicationController
       #save image whenever its a login - since they can expire
       user.providerImage = auth['info']['image']
       user.fetch_spotify_data
+      user.save
       token = encode_token(user_id: user.id)
       redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
     end
