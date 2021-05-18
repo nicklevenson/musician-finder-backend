@@ -95,7 +95,7 @@ class User < ApplicationRecord
   end
 
   def rejected_users
-    User.where(id: self.rejections.map{|r| r.rejected_id})
+    User.where(id: self.rejections.pluck(:rejected_id))
   end
   
   def reject_user(user_id)
@@ -216,7 +216,7 @@ class User < ApplicationRecord
   def similarly_tagged_users(range: nil, instruments: nil, genres: nil)
     conn = ActiveRecord::Base
     all_users = User.all
-    no_ids = self.connected_users.ids.push(self.id)
+    no_ids = self.connected_users.ids.push(self.id).concat(self.rejections.pluck(:rejected_id))
     range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(all_users, range)]) : "true"
 
     instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
