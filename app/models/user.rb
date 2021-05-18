@@ -227,7 +227,7 @@ class User < ApplicationRecord
                              : "true"
 
     sql2 = <<~SQL
-      SELECT u.id, COALESCE(matching_tag_counts.n, 0) AS similarity_score
+      SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
       FROM users AS u
         LEFT OUTER JOIN (
           SELECT user_id, COUNT(*) AS n
@@ -242,7 +242,7 @@ class User < ApplicationRecord
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    User.includes(:instruments, :genres).where(id: all_users.find_by_sql(sanatized))
+    User.includes(:instruments, :genres).find_by_sql(sanatized)
   end
 
   private

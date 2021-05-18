@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+require 'byebug'
 RSpec.describe User, type: :model do
 
   before do
@@ -97,32 +97,29 @@ RSpec.describe User, type: :model do
 
     describe("recommended users") do
       before do
-        @user1.tags.build(name: "rock")
-        @user1.tags.build(name: "country")
-        @user1.tags.build(name: "blues")
-        @user1.save
+        tag1 = Tag.create(name: "rock")
+        tag2 = Tag.create(name: "country")
+        tag3 = Tag.create(name: "blues")
+        tag4 = Tag.create(name: "house")
+        tag5 = Tag.create(name: "disco")
 
-        @user2.tags.build(name: "rock")
-        @user2.tags.build(name: "country")
-        @user2.tags.build(name: "disco")
-        @user2.save
+        tag1.users << [@user1, @user2]
+        tag2.users << [@user1, @user2]
+        tag3.users << [@user1]
+        tag4.users << [@user3]
+        tag5.users << [@user2, @user3]
 
-        @user3.tags.build(name: "house")
-        @user3.tags.build(name: "rap")
-        @user3.tags.build(name: "disco")
-        @user3.save
+        Tag.all.each{|tag|tag.save}
+        User.all.each{|user|user.save}
+      
       end
       it "gives a list of recommended users based on similar tags" do
-        expect(@user1.recommended_users.first[:user]).to eq(@user2)
-        expect(@user1.recommended_users.last[:user]).to eq(@user3)
-        expect(@user1.recommended_users.last[:similar_tags]).to eq([])
-        expect(@user1.recommended_users.first[:similar_tags]).to eq(["rock", "country"])
-
-        expect(@user2.recommended_users.first[:user]).to eq(@user1)
-        expect(@user2.recommended_users.last[:user]).to eq(@user3)
-        expect(@user2.recommended_users.last[:similar_tags]).to eq(["disco"])
-
-        expect(@user3.recommended_users.first[:user]).to eq(@user2)
+        expect(@user1.recommended_users({}).first).to eq(@user2)
+        expect(@user1.recommended_users({}).last).to eq(@user3)
+        expect(@user2.recommended_users({}).first).to eq(@user1)
+        expect(@user2.recommended_users({}).last).to eq(@user3)
+        expect(@user3.recommended_users({}).first).to eq(@user2)
+        
       end
     end
 
@@ -133,11 +130,11 @@ RSpec.describe User, type: :model do
         @user3.accept_incoming_connection(@user1.id)
       end
       it "creates a new notification for the user that is being requested" do
-        expect(@user2.notifications.length).to eq(1)
+        expect(@user2.notifications.length).to eq(2)
       end
       it "creates a new notification for the requesting user when the request was accepted" do
-        expect(@user3.notifications.length).to eq(1)
-        expect(@user1.notifications.length).to eq(1)
+        expect(@user3.notifications.length).to eq(2)
+        expect(@user1.notifications.length).to eq(2)
       end 
     end
   end
