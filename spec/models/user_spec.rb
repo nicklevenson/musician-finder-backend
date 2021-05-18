@@ -112,9 +112,15 @@ RSpec.describe User, type: :model do
         @tag4.users << [@user3]
         @tag5.users << [@user2, @user3]
 
+
+        @genre = Genre.create(name: "Rock")
+        @instrument = Instrument.create(name: "Guitar")
+        @genre.users << [@user1, @user2]
+        @instrument.users << @user3
+
         Tag.all.each{|tag|tag.save}
         User.all.each{|user|user.save}
-      
+
       end
       it "gives a list of recommended users based on similar tags" do
         expect(@user1.recommended_users({}).first).to eq(@user2)
@@ -125,6 +131,14 @@ RSpec.describe User, type: :model do
         
         expect(@user3.similar_tags(@user1.id)).to eq([])
         expect(@user3.similar_tags(@user2.id).first).to eq(@tag5)
+      end
+
+      it "gives list based on filter parameters" do 
+        expect(@user1.similarly_tagged_users(instruments: ["Guitar"])).to eq([@user3])
+        expect(@user1.similarly_tagged_users(genres: ["Rock", "Blues"])).to eq([@user2])
+        expect(@user1.similarly_tagged_users(range: 400)).to eq([@user2, @user3])
+        expect(@user1.similarly_tagged_users(range: 400, genres:["Rock"])).to eq([@user2])
+        expect(@user1.similarly_tagged_users(range: 400, genres:["Rock"], instruments: ["Guitar"])).to eq([@user2, @user3])
       end
     end
 
