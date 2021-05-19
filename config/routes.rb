@@ -21,12 +21,13 @@ Rails.application.routes.draw do
 
   post 'notifications/make_read', to: 'notifications#make_read'
 
-  
-  resources :chatrooms
+  get 'lists/get-instruments', to: 'lists#get_instruments'
+  get 'lists/get-genres', to: 'lists#get_genres'
+  get 'lists/get-cities', to: 'lists#get_cities'
+
   resources :messages
   resources :posts
   resources :notifications
-  resources :connections
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
