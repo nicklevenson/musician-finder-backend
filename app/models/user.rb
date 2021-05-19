@@ -219,12 +219,17 @@ class User < ApplicationRecord
     no_ids = self.connected_users.ids.push(self.id).concat(self.rejections.pluck(:rejected_id))
     range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(all_users, range)]) : "true"
 
-    instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
-    genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
-    combined_ids = genre_user_ids.concat(instrument_user_ids)
-    genre_instrument_query = !combined_ids.empty? ?
-                             conn.sanitize_sql_array(["u.id IN(?)", combined_ids]) 
-                             : "true"
+    #must fix issue when filter is set but there are no results (currently displaying all results)
+    if instruments || genres
+      instrument_user_ids = Userinstrument.where(instrument_id: Instrument.where(name: instruments)).pluck(:user_id)
+      genre_user_ids = Usergenre.where(genre_id: Genre.where(name: genres)).pluck(:user_id)
+      combined_ids = genre_user_ids.concat(instrument_user_ids)
+      genre_instrument_query = !combined_ids.empty? ?
+                              conn.sanitize_sql_array(["u.id IN(?)", combined_ids]) 
+                              : "false"
+    else
+      genre_instrument_query = "true"
+    end
 
     sql2 = <<~SQL
       SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
