@@ -24,7 +24,14 @@ class UsersController < ApplicationController
     similar_tags = @user.similar_tags(params[:other_user_id])
     instruments = @user.instruments.pluck(:name)
     genres = @user.genres.pluck(:name)
-    info = {similar_tags: similar_tags, instruments: instruments, genres: genres}
+    generic_tags = @user.tags.where(tag_type: nil).or(@user.tags.where.not(tag_type: "spotify_artist"))
+    spotify_tags = @user.tags.where(tag_type: "spotify_artist")
+    
+    info = {similar_tags: similar_tags, 
+            instruments: instruments, 
+            genres: genres, 
+            generic_tags: generic_tags, 
+            spotify_tags: spotify_tags}
     render json: MultiJson.dump(info)
   end
 
