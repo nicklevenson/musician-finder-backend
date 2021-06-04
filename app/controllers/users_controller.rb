@@ -129,7 +129,11 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:bio, :location, tags_attributes: [:name, :tag_type, :spotify_uri, :spotify_image_url, :spotify_link], genres_attributes: [:name], instruments_attributes: [:name])
+      params.require(:user).permit(
+        :bio, :location, :lat, :lng, 
+        tags_attributes: [:name, :tag_type, :spotify_uri, :spotify_image_url, :spotify_link], 
+        genres_attributes: [:name], instruments_attributes: [:name]
+      )
     end
 
     def recommended_users_params
