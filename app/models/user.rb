@@ -194,6 +194,7 @@ class User < ApplicationRecord
     self.tags.delete_all
     tags_attributes.each do |tag_attribute|
       tag = Tag.find_or_create_by(name: tag_attribute["name"])
+      tag.update(link: tag_attribute["link"], image_url: tag_attribute["image_url"])
       self.tags << tag unless self.tags.include?(tag)
     end
   end

@@ -133,7 +133,7 @@ class UsersController < ApplicationController
       params.require(:user).permit(
         :bio, :location, :lat, :lng, 
         :spotify_link, :soundcloud_link, :bandcamp_link, :youtube_link, :apple_music_link, :instagram_link,
-        tags_attributes: [:name, :tag_type, :spotify_uri, :spotify_image_url, :spotify_link], 
+        tags_attributes: [:name, :tag_type, :uri, :image_url, :link], 
         genres_attributes: [:name], instruments_attributes: [:name]
       )
     end
