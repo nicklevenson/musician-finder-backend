@@ -235,7 +235,8 @@ class User < ApplicationRecord
     end
 
     sql2 = <<~SQL
-      SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score
+      SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score, 
+      COALESCE(matching_genre_count.x, 0) AS genre_score
       FROM users AS u
         LEFT OUTER JOIN (
           SELECT user_id, COUNT(*) AS n
@@ -243,10 +244,16 @@ class User < ApplicationRecord
           WHERE #{conn.sanitize_sql_array(["tag_id IN(?)", self.tag_ids])}
           GROUP BY user_id
         ) AS matching_tag_counts ON u.id=matching_tag_counts.user_id
+        LEFT OUTER JOIN (
+          SELECT user_id, COUNT(*) AS x
+          FROM usergenres
+          WHERE #{conn.sanitize_sql_array(["genre_id IN(?)", self.genre_ids])}
+          GROUP BY user_id
+        ) AS matching_genre_count ON u.id=matching_genre_count.user_id
         WHERE #{conn.sanitize_sql_array(["u.id NOT IN(?)", no_ids])}
         AND #{range_query}
         AND #{genre_instrument_query}
-        ORDER BY similarity_score DESC
+        ORDER BY similarity_score DESC, genre_score DESC
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
