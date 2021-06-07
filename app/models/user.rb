@@ -91,7 +91,9 @@ class User < ApplicationRecord
 
   def similar_tags(user_id)
     other_user = User.find(user_id)
-    other_user.tags.includes(:users).where(:users => {id: self.id})
+    tags = other_user.tags.includes(:users).where(:users => {id: self.id}).pluck(:name)
+    genres = other_user.genres.includes(:users).where(:users => {id: self.id}).pluck(:name)
+    tags+genres
   end
 
   def rejected_users
@@ -193,7 +195,7 @@ class User < ApplicationRecord
   def tags_attributes=(tags_attributes)
     self.tags.delete_all
     tags_attributes.each do |tag_attribute|
-      tag = Tag.find_or_create_by(name: tag_attribute["name"])
+      tag = Tag.find_or_create_by(name: tag_attribute["name"], link: tag_attribute["link"])
       tag.update(link: tag_attribute["link"], image_url: tag_attribute["image_url"])
       self.tags << tag unless self.tags.include?(tag)
     end
