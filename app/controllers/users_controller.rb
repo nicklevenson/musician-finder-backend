@@ -117,7 +117,13 @@ class UsersController < ApplicationController
   end
 
   def upload_photo
-      req = Cloudinary::Uploader.upload(params[:photo], public_id: @user.provider)
+      req = Cloudinary::Uploader.upload(
+        params[:photo], 
+        public_id: @user.id, 
+        :crop => :fill, :width => 500, :height => 500, 
+        format: 'jpg', 
+        gravity: :face
+      )
       if req["url"]
         @user.photo = req["url"]
         @user.save
