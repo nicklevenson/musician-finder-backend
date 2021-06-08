@@ -112,9 +112,21 @@ class UsersController < ApplicationController
     if @user.update(user_params)
       render json: @user
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: @user.errors, status: :unprocessable_entityå
     end
   end
+
+  def upload_photo
+      req = Cloudinary::Uploader.upload(params[:photo], public_id: @user.provider)
+      if req["url"]
+        @user.photo = req["url"]
+        @user.save
+        render json: {message: "Successful upload"}
+      else
+        render json: {message: "Bad Upload"}, status: :unprocessable_entity
+      end
+  end
+
 
   # DELETE /users/1
   def destroy
@@ -130,8 +142,9 @@ class UsersController < ApplicationController
     # Only allow a list of trusted parameters through.
 
     def user_params
+      
       params.require(:user).permit(
-        :bio, :location, :lat, :lng, 
+        :bio, :location, :lat, :lng,
         :spotify_link, :soundcloud_link, :bandcamp_link, :youtube_link, :apple_music_link, :instagram_link,
         tags_attributes: [:name, :tag_type, :uri, :image_url, :link], 
         genres_attributes: [:name], instruments_attributes: [:name]

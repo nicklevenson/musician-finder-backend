@@ -190,6 +190,21 @@ class User < ApplicationRecord
     end
   end
 
+  #photo upload
+
+  # def photo_upload(data)
+  #    byebug
+  #   auth = {
+  #     cloud_name: Rails.application.credentials.cloudinary[:cloudname],
+  #     api_key: Rails.application.credentials.cloudinary[:key],
+  #     api_secret: Rails.application.credentials.cloudinary[:secret]
+  #   }
+  #   req = Cloudinary::Uploader.upload(photo, auth)
+   
+  #   self.photo = req.response
+  # end
+
+
 
   # nested helpers
   def tags_attributes=(tags_attributes)

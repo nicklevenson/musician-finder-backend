@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   post 'users/:id/accept_connection', to: 'users#accept_connection'
   post 'users/:id/reject_connection', to: 'users#reject_connection'
   post 'users/:id/reject_user', to: 'users#reject_user'
-
+  post 'users/:id/upload_photo', to: 'users#upload_photo'
   post 'messages/make_read', to: 'messages#make_read'
 
   post 'notifications/make_read', to: 'notifications#make_read'
