@@ -119,7 +119,7 @@ class UsersController < ApplicationController
   def upload_photo
       req = Cloudinary::Uploader.upload(
         params[:photo], 
-        public_id: @user.id, 
+        public_id: @user.id + @user.uid.to_i, 
         :crop => :fill, :width => 500, :height => 500, 
         format: 'jpg', 
         gravity: :face
