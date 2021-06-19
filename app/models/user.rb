@@ -36,7 +36,7 @@ class User < ApplicationRecord
     genres = parameters["genres"] && parameters["genres"].length > 0 ? parameters["genres"] : nil
       
     similar_users = similarly_tagged_users(range: range, instruments: instruments, genres: genres)
-
+ 
   end
 
   #connection methods
@@ -186,21 +186,6 @@ class User < ApplicationRecord
    
   end
 
-  #photo upload
-
-  # def photo_upload(data)
-  #    byebug
-  #   auth = {
-  #     cloud_name: Rails.application.credentials.cloudinary[:cloudname],
-  #     api_key: Rails.application.credentials.cloudinary[:key],
-  #     api_secret: Rails.application.credentials.cloudinary[:secret]
-  #   }
-  #   req = Cloudinary::Uploader.upload(photo, auth)
-   
-  #   self.photo = req.response
-  # end
-
-
 
   # nested helpers
   def tags_attributes=(tags_attributes)
@@ -231,7 +216,15 @@ class User < ApplicationRecord
     conn = ActiveRecord::Base
     all_users = User.all
     no_ids = self.connected_users.ids.push(self.id).concat(self.rejections.pluck(:rejected_id))
-    range_query = range ? conn.sanitize_sql_array(["u.id IN(?)", self.users_in_range(all_users, range)]) : "true"
+
+    if range 
+      range_ids = self.users_in_range(all_users, range)
+      range_query = range_ids.empty? ? "false" : conn.sanitize_sql_array(["u.id IN(?)", range_ids])
+      
+    else
+      range_query = "true"
+    end
+    
 
     #must fix issue when filter is set but there are no results (currently displaying all results)
     if instruments || genres
@@ -244,6 +237,8 @@ class User < ApplicationRecord
     else
       genre_instrument_query = "true"
     end
+
+
 
     sql2 = <<~SQL
       SELECT u.*, COALESCE(matching_tag_counts.n, 0) AS similarity_score, 
@@ -268,7 +263,8 @@ class User < ApplicationRecord
         LIMIT 50
     SQL
     sanatized = ActiveRecord::Base::sanitize_sql(sql2)
-    User.find_by_sql(sanatized)
+    results = User.find_by_sql(sanatized)
+
   end
 
   def set_coords
