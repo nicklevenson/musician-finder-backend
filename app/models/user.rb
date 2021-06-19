@@ -141,6 +141,7 @@ class User < ApplicationRecord
   #spotify methods
 
   def fetch_spotify_data
+   
     if self.provider === 'spotify'
       refresh_spotify_token
       header = {
@@ -171,12 +172,7 @@ class User < ApplicationRecord
     end
   end
 
-  def spotify_token_expired
-    (Time.now - self.updated_at) > 3300
-  end
-
   def refresh_spotify_token
-    if spotify_token_expired
       body = {
         grant_type: "refresh_token",
         refresh_token: self.refresh_token,
@@ -187,7 +183,7 @@ class User < ApplicationRecord
       resp = RestClient.post('https://accounts.spotify.com/api/token', body)
       json = JSON.parse(resp)
       self.token = json["access_token"]
-    end
+   
   end
 
   #photo upload

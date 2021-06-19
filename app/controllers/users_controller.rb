@@ -150,6 +150,7 @@ class UsersController < ApplicationController
     def user_params
       
       params.require(:user).permit(
+        :email, :username,
         :bio, :location, :lat, :lng,
         :spotify_link, :soundcloud_link, :bandcamp_link, :youtube_link, :apple_music_link, :instagram_link,
         tags_attributes: [:name, :tag_type, :uri, :image_url, :link], 
