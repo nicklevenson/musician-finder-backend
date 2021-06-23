@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authorized, except: [:index, :create, :show]
+  before_action :authorized, except: [:index, :create, :show, :unsubscribe_to_email]
   before_action :set_user, except: [:index, :create]
 
   # GET /users
@@ -14,6 +14,41 @@ class UsersController < ApplicationController
     render json: MultiJson.dump(@user, except: [:token, :refresh_token], 
       methods: [:connected_users, :outgoing_pending_requests], 
       include: [:tags => {except: [:created_at, :updated_at]}, :genres => {only: :name}, :instruments => {only: :name}])
+  end
+
+    def create
+    user = User.find_or_create_by(uid: auth['uid'], provider: auth['provider']) do |u|
+      u.providerImage = auth['info']['image']
+      u.username = auth['info']['name']
+      u.email = auth['info']['email']
+      if auth['credentials']['token']
+        u.token = auth['credentials']['token']
+        u.refresh_token = auth['credentials']['refresh_token']
+      end
+    end
+    if user
+      #save image whenever its a login - since they can expire
+      user.providerImage = auth['info']['image']
+      user.fetch_spotify_data
+      user.save
+      token = encode_token(user_id: user.id)
+      redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
+    end
+  end
+
+  # PATCH/PUT /users/1
+  def update
+    if @user.update(user_params)
+      render json: @user
+    else
+      render json: @user.errors, status: :unprocessable_entityå
+    end
+  end
+
+
+  # DELETE /users/1
+  def destroy
+    @user.destroy
   end
 
   def get_similar_tags
@@ -62,27 +97,6 @@ class UsersController < ApplicationController
     render json: MultiJson.dump(@user.notifications)
   end
 
-  # POST /users
-  def create
-    user = User.find_or_create_by(uid: auth['uid'], provider: auth['provider']) do |u|
-      u.providerImage = auth['info']['image']
-      u.username = auth['info']['name']
-      u.email = auth['info']['email']
-      if auth['credentials']['token']
-        u.token = auth['credentials']['token']
-        u.refresh_token = auth['credentials']['refresh_token']
-      end
-    end
-    if user
-      #save image whenever its a login - since they can expire
-      user.providerImage = auth['info']['image']
-      user.fetch_spotify_data
-      user.save
-      token = encode_token(user_id: user.id)
-      redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
-    end
-  end
-
   def request_connection
     if @user.request_connection(params[:requested_id])
       render json: {message: "Successfully requested"}
@@ -107,15 +121,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # PATCH/PUT /users/1
-  def update
-    if @user.update(user_params)
-      render json: @user
-    else
-      render json: @user.errors, status: :unprocessable_entityå
-    end
-  end
-
   def upload_photo
       req = Cloudinary::Uploader.upload(
         params[:photo], 
@@ -133,11 +138,11 @@ class UsersController < ApplicationController
       end
   end
 
-
-  # DELETE /users/1
-  def destroy
-    @user.destroy
+  def unsubscribe_to_email
+    @user.email_subscribe = false
+    @user.save
   end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

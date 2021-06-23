@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_18_182038) do
+ActiveRecord::Schema.define(version: 2021_06_23_022450) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_182038) do
     t.string "spotify_link"
     t.string "apple_music_link"
     t.string "instagram_link"
+    t.boolean "email_subscribe", default: true
   end
 
   create_table "usertags", force: :cascade do |t|

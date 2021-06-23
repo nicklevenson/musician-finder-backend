@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <p>Hi <%= @user.username %>,</p>
+    <p>
+      <%if @notification.involved_username%>
+        <%=@notification.involved_username + " "%>
+      <%end%>
+        <%= @notification.content%>.
+    </p>
+    
+    <p>Thanks for using Peanut Butter & Jam and have a great day!</p>
+
+    <%=link_to "Unsubscribe", unsubscribe_to_email_url(id: @user.id)%>
+  </body>
+</html>

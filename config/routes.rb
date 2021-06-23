@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get 'users/:id/get_supporting_info/:other_user_id', to: 'users#get_supporting_info'
   get 'users/:id/get_user_chatrooms', to: 'users#get_user_chatrooms'
   get 'users/:id/get_user_notifications', to: 'users#get_user_notifications'
+  get 'users/:id/unsubscribe', to: 'users#unsubscribe_to_email', as: :unsubscribe_to_email
   post 'users/:id/request_connection', to: 'users#request_connection'
   post 'users/:id/accept_connection', to: 'users#accept_connection'
   post 'users/:id/reject_connection', to: 'users#reject_connection'
