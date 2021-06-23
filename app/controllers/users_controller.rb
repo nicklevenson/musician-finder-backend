@@ -141,6 +141,7 @@ class UsersController < ApplicationController
   def unsubscribe_to_email
     @user.email_subscribe = false
     @user.save
+    redirect_to('http://localhost:3001/unsubscribed')
   end
 
 
