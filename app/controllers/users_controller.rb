@@ -32,7 +32,11 @@ class UsersController < ApplicationController
       user.fetch_spotify_data
       user.save
       token = encode_token(user_id: user.id)
-      redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
+      if user.location === "Earth"
+        redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}" + "?&edit=true")
+      else
+        redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
+      end
     end
   end
 
