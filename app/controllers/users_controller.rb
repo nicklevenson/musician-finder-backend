@@ -27,13 +27,15 @@ class UsersController < ApplicationController
       end
     end
     if user
+      user.login_count = user.login_count + 1
       #save image whenever its a login - since they can expire
       user.providerImage = auth['info']['image']
       user.fetch_spotify_data
       user.save
+
       token = encode_token(user_id: user.id)
-      if user.location === "Earth"
-        redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}" + "?&edit=true")
+      if user.login_count === 1
+        redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}" + "?&new=true")
       else
         redirect_to('http://localhost:3001/login' + "?token=#{token}" + "?&id=#{user.id}")
       end
